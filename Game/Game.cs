@@ -5,6 +5,8 @@ namespace Rayterra.Game;
 using Raylib_cs;
 using ImGuiNET;
 using rlImGui_cs;
+using Rayterra.Core;
+using System.Numerics;
 
 public class Game
 {
@@ -13,15 +15,35 @@ public class Game
     private const string WINDOW_TITLE = "Rayterra";
     private const int FPS = 60;
 
-    private readonly EntityManager _manager = new();
+    private EntityManager _manager = null!;
+    private TextureAtlas _atlas = null!;
 
-    private void Init()
+    public Game()
+    {
+        InitWindow();
+        LoadTextures();
+
+        InitSystems();
+    }
+
+    private void InitWindow()
     {
         Raylib.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
         Raylib.SetTargetFPS(FPS);
         Raylib.ToggleFullscreen();
 
         rlImGui.Setup(true);
+    }
+
+    private void LoadTextures()
+    {
+        Assets.LoadTexture("gameAtlas", "./Assets/RayterraAtlas.png");
+    }
+
+    private void InitSystems()
+    {
+        _manager = new();
+        _atlas = new(Assets.GetTexture("gameAtlas"), 16);
     }
 
     private void Update()
@@ -42,6 +64,8 @@ public class Game
 #if DEBUG
         RenderDebugUI();
 #endif
+
+        _atlas.RenderTile(0, 0, new Vector2(100, 100), 5);
 
         Raylib.EndDrawing();
     }
@@ -64,7 +88,6 @@ public class Game
 
     public void Run()
     {
-        Init();
         while (!Raylib.WindowShouldClose())
         {
             Update();

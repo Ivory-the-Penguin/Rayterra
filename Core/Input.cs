@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace Rayterra.Core.Input;
+namespace Rayterra.Core;
 
 public static class Input
 {

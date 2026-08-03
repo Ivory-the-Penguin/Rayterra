@@ -1,6 +1,6 @@
 using Raylib_cs;
 
-namespace Core;
+namespace Rayterra.Core;
 
 public static class Assets
 {
