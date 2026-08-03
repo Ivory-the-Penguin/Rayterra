@@ -18,8 +18,7 @@ public class Game
 
     private EntityManager _manager = null!;
     private Map _map = null!;
-
-    private Camera2D _camera;
+    private Camera _camera = null!;
 
     public Game()
     {
@@ -46,8 +45,7 @@ public class Game
     {
         _manager = new();
         _map = new();
-
-        _camera = new(Vector2.Zero, Raylib.GetScreenCenter(), 0, 2);
+        _camera = new();
     }
 
     private void Update()
@@ -56,14 +54,9 @@ public class Game
 
         float deltaTime = Raylib.GetFrameTime();
 
-        int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
-        int keyY = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.S)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.W));
-
-        const int SPEED = 20;
-
-        _camera.Target += new Vector2(keyX * SPEED, keyY * SPEED);
-
         _manager.Update(deltaTime);
+
+        _camera.Update(deltaTime);
 
         Profiler.EndProfile();
     }
@@ -76,7 +69,7 @@ public class Game
 
         Raylib.ClearBackground(Color.Black);
 
-        Raylib.BeginMode2D(_camera);
+        Raylib.BeginMode2D(_camera.Object);
 
         _manager.Render();
         _map.Render();
