@@ -59,7 +59,7 @@ public class Game
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
         int keyY = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.S)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.W));
 
-        const int SPEED = 10;
+        const int SPEED = 20;
 
         _camera.Target += new Vector2(keyX * SPEED, keyY * SPEED);
 
