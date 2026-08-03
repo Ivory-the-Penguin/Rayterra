@@ -1,6 +1,6 @@
 using Rayterra.Core.Entity;
 
-namespace Rayterra.Game;
+namespace Rayterra;
 
 using Raylib_cs;
 using ImGuiNET;
@@ -65,7 +65,7 @@ public class Game
         RenderDebugUI();
 #endif
 
-        _atlas.RenderTile(0, 0, new Vector2(100, 100), 5);
+        _atlas.RenderTile(1, 0, new Vector2(100, 100), 3);
 
         Raylib.EndDrawing();
     }

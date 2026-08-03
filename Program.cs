@@ -1,2 +1,2 @@
-﻿Rayterra.Game.Game game = new();
+﻿Rayterra.Game game = new();
 game.Run();
