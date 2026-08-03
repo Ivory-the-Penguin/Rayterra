@@ -12,7 +12,7 @@ public static class Profiler
 
     public static void BeginProfile(string name)
     {
-        _stack.Push(new StackProfile(name, (float)(Raylib.GetTime() / 1000)));
+        _stack.Push(new StackProfile(name, (float)(Raylib.GetTime() * 1000)));
     }
 
     public static void EndProfile()
@@ -24,7 +24,7 @@ public static class Profiler
 
         StackProfile profile = _stack.Pop();
 
-        float currentTime = (float)(Raylib.GetTime() / 1000);
+        float currentTime = (float)(Raylib.GetTime() * 1000);
 
         _profiles[profile.name] = new Profile(currentTime - profile.startTime);
     }

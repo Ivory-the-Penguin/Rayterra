@@ -52,6 +52,8 @@ public class Game
 
     private void Update()
     {
+        Profiler.BeginProfile("update");
+
         float deltaTime = Raylib.GetFrameTime();
 
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
@@ -62,6 +64,8 @@ public class Game
         _camera.Target += new Vector2(keyX * SPEED, keyY * SPEED);
 
         _manager.Update(deltaTime);
+
+        Profiler.EndProfile();
     }
 
     private void Render()
@@ -83,6 +87,9 @@ public class Game
         RenderDebugUI();
 #endif
 
+        Profiler.EndProfile();
+
+        Profiler.BeginProfile("present");
         Raylib.EndDrawing();
         Profiler.EndProfile();
     }
@@ -106,7 +113,9 @@ public class Game
 
         ImGui.NewLine();
 
-        ImGui.Text($"Rendering time: {Profiler.GetProfile("render")} ms");
+        ImGui.Text($"Updating time: {Profiler.GetProfile("update").time} ms");
+        ImGui.Text($"Rendering time: {Profiler.GetProfile("render").time} ms");
+        ImGui.Text($"Present time: {Profiler.GetProfile("present").time} ms");
 
         rlImGui.End();
     }
