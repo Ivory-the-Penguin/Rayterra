@@ -8,7 +8,6 @@ public class Map
 {
     private const int TILE_SIZE = 16;
     private const int TILE_SCALE = 2;
-    private const int TILE_IN_RENDER = TILE_SIZE * TILE_SCALE;
 
     private TextureAtlas _atlas;
 
@@ -54,7 +53,7 @@ public class Map
         {
             for (int j = 0; j < 100; j++)
             {
-                _atlas.RenderTile((int)_tiles[i][j], new Vector2(i * TILE_IN_RENDER + 100, j * TILE_IN_RENDER + 100), TILE_SCALE);
+                _atlas.RenderTile((int)_tiles[i][j], new Vector2(i * TILE_SIZE + 100, j * TILE_SIZE + 100), 1);
             }
         }
     }

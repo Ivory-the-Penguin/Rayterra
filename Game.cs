@@ -7,6 +7,7 @@ using ImGuiNET;
 using rlImGui_cs;
 using Rayterra.Core;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 
 public class Game
 {
@@ -17,6 +18,8 @@ public class Game
 
     private EntityManager _manager = null!;
     private Map _map = null!;
+
+    private Camera2D _camera;
 
     public Game()
     {
@@ -43,11 +46,20 @@ public class Game
     {
         _manager = new();
         _map = new();
+
+        _camera = new(Vector2.Zero, Raylib.GetScreenCenter(), 0, 2);
     }
 
     private void Update()
     {
         float deltaTime = Raylib.GetFrameTime();
+
+        int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
+        int keyY = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.S)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.W));
+
+        const int SPEED = 10;
+
+        _camera.Target += new Vector2(keyX * SPEED, keyY * SPEED);
 
         _manager.Update(deltaTime);
     }
@@ -58,8 +70,12 @@ public class Game
 
         Raylib.ClearBackground(Color.Black);
 
+        Raylib.BeginMode2D(_camera);
+
         _manager.Render();
         _map.Render();
+
+        Raylib.EndMode2D();
 
 #if DEBUG
         RenderDebugUI();
