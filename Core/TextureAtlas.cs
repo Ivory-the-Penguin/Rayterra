@@ -44,6 +44,11 @@ public class TextureAtlas
 
     public void RenderTile(int id, Vector2 position, float scale)
     {
+        if (id < 0)
+        {
+            return;
+        }
+
         int y = id / _atlasWidth;
         int x = id % _atlasWidth;
 
