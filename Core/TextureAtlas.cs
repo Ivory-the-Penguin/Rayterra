@@ -39,7 +39,7 @@ public class TextureAtlas
             Height = scale * _tileSize
         };
 
-        Raylib.DrawTexturePro(_atlas, source, dest, new Vector2(dest.Width, dest.Height), 0, Color.White);
+        Raylib.DrawTexturePro(_atlas, source, dest, new Vector2(0, 0), 0, Color.White);
     }
 
     public void RenderTile(int id, Vector2 position, float scale)

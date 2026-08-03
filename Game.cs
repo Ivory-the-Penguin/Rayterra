@@ -16,7 +16,7 @@ public class Game
     private const int FPS = 60;
 
     private EntityManager _manager = null!;
-    private TextureAtlas _atlas = null!;
+    private Map _map = null!;
 
     public Game()
     {
@@ -37,13 +37,12 @@ public class Game
 
     private void LoadTextures()
     {
-        Assets.LoadTexture("gameAtlas", "./Assets/RayterraAtlas.png");
     }
 
     private void InitSystems()
     {
         _manager = new();
-        _atlas = new(Assets.GetTexture("gameAtlas"), 16);
+        _map = new();
     }
 
     private void Update()
@@ -60,12 +59,11 @@ public class Game
         Raylib.ClearBackground(Color.Black);
 
         _manager.Render();
+        _map.Render();
 
 #if DEBUG
         RenderDebugUI();
 #endif
-
-        _atlas.RenderTile(1, 0, new Vector2(100, 100), 3);
 
         Raylib.EndDrawing();
     }

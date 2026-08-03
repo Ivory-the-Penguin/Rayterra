@@ -9,14 +9,24 @@ public static class Assets
 
     private static readonly Dictionary<string, TextureAtlas> _atlases = new();
 
-    public static void LoadTexture(string name, string path) => _textures.Add(name, Raylib.LoadTexture(path));
+    public static Texture2D LoadTexture(string name, string path)
+    {
+        _textures.Add(name, Raylib.LoadTexture(path));
+        return _textures[name];
+    }
 
-    public static void LoadSound(string name, string path) => _sounds.Add(name, Raylib.LoadSound(path));
+    public static Sound LoadSound(string name, string path)
+    {
+        _sounds.Add(name, Raylib.LoadSound(path));
+        return _sounds[name];
+    }
 
-    public static void InitAtlas(string name, string path, int tileSize)
+    public static TextureAtlas InitAtlas(string name, string path, int tileSize)
     {
         LoadTexture(name, path);
         _atlases.Add(name, new TextureAtlas(GetTexture(name), tileSize));
+
+        return _atlases[name];
     }
 
     public static Texture2D GetTexture(string name) => _textures[name];
