@@ -66,6 +66,8 @@ public class Game
 
     private void Render()
     {
+        Profiler.BeginProfile("render");
+
         Raylib.BeginDrawing();
 
         Raylib.ClearBackground(Color.Black);
@@ -82,6 +84,7 @@ public class Game
 #endif
 
         Raylib.EndDrawing();
+        Profiler.EndProfile();
     }
 
     private int _scale = 10;
@@ -100,6 +103,10 @@ public class Game
         {
             _map.GenMap(_scale);
         }
+
+        ImGui.NewLine();
+
+        ImGui.Text($"Rendering time: {Profiler.GetProfile("render")} ms");
 
         rlImGui.End();
     }
