@@ -12,15 +12,20 @@ public class Map
 
     private TextureAtlas _atlas;
 
-    private List<List<TileID>> _tiles;
+    private List<List<TileID>> _tiles = null!;
 
     public Map()
     {
         _atlas = Assets.InitAtlas("MapAtlas", "./Assets/RayterraAtlas.png", TILE_SIZE);
 
+        GenMap(10);
+    }
+
+    public void GenMap(int scale)
+    {
         _tiles = new(100);
 
-        Image perlin = Raylib.GenImagePerlinNoise(100, 100, 0, 0, 10);
+        Image perlin = Raylib.GenImagePerlinNoise(100, 100, 0, 0, scale);
 
         for (int i = 0; i < 100; i++)
         {
@@ -40,6 +45,7 @@ public class Map
                 }
             }
         }
+
     }
 
     public void Render()

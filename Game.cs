@@ -68,12 +68,22 @@ public class Game
         Raylib.EndDrawing();
     }
 
+    private int _scale = 10;
+
     private void RenderDebugUI()
     {
         rlImGui.Begin();
 
         ImGui.Text($"FPS: {Raylib.GetFPS()}");
         ImGui.Text($"Total Entities: {_manager.Count}");
+
+        ImGui.NewLine();
+
+        ImGui.InputInt("Scale", ref _scale);
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            _map.GenMap(_scale);
+        }
 
         rlImGui.End();
     }
