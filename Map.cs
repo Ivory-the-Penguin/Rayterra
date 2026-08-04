@@ -9,8 +9,8 @@ public class Map
 {
     private const int TILE_SIZE = 16;
 
-    private const int WORLD_WIDTH = 1000;
-    private const int WORLD_HEIGHT = 100;
+    private const int WORLD_WIDTH = 2100;
+    private const int WORLD_HEIGHT = 600;
 
     private TextureAtlas _atlas;
 
@@ -19,35 +19,49 @@ public class Map
     public Map()
     {
         _atlas = Assets.InitAtlas("MapAtlas", "./Assets/RayterraAtlas.png", TILE_SIZE);
-
-        GenMap(10);
     }
 
-    public void GenMap(int scale)
+    public void ClearWorld()
     {
         _tiles = new(WORLD_WIDTH);
+        for (int i = 0; i < WORLD_WIDTH; i++)
+        {
+            List<TileID> column = new(WORLD_HEIGHT);
+            for (int j = 0; j < WORLD_HEIGHT; j++)
+            {
+                column.Add(TileID.None);
+            }
+            _tiles.Add(column);
+        }
+    }
 
-        Image perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, WORLD_HEIGHT, 0, 0, scale);
+    private const int GRASS_MAX_HEIGHT = 40;
+    private const int GRASS_RANGE = 40;
+
+    public void GenMap(float scale)
+    {
+        ClearWorld();
+
+        Image perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, 1, 0, 0, scale);
 
         for (int i = 0; i < WORLD_WIDTH; i++)
         {
-            List<TileID> cur = new(WORLD_HEIGHT);
-            _tiles.Add(cur);
-            for (int j = 0; j < WORLD_HEIGHT; j++)
-            {
-                Color color = Raylib.GetImageColor(perlin, i, j);
+            int grassHeight = (int)((float)Raylib.GetImageColor(perlin, i, 0).R / 255 * GRASS_RANGE) + GRASS_MAX_HEIGHT;
 
-                if (color.R > 120)
+            for (int j = grassHeight; j < WORLD_HEIGHT; j++)
+            {
+                if (j == grassHeight)
                 {
-                    cur.Add(TileID.None);
+                    _tiles[i][j] = TileID.Grass;
                 }
                 else
                 {
-                    cur.Add(TileID.Dirt);
+                    _tiles[i][j] = TileID.Dirt;
                 }
             }
         }
 
+        Raylib.UnloadImage(perlin);
     }
 
     public void Render(Camera camera)
@@ -74,6 +88,8 @@ public class Map
                 _atlas.RenderTile((int)_tiles[i][j], new Vector2(i * TILE_SIZE, j * TILE_SIZE), 1);
             }
         }
+
+        Raylib.DrawRectangleLines(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE, Color.Red);
     }
 
     public Vector2 WorldToMapPosition(Vector2 position)

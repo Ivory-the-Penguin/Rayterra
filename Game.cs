@@ -46,6 +46,8 @@ public class Game
         _manager = new();
         _map = new();
         _camera = new();
+
+        _map.GenMap(_scale);
     }
 
     private void Update()
@@ -87,7 +89,7 @@ public class Game
         Profiler.EndProfile();
     }
 
-    private int _scale = 10;
+    private float _scale = 0.008f;
 
     private void RenderDebugUI()
     {
@@ -98,8 +100,8 @@ public class Game
 
         ImGui.NewLine();
 
-        ImGui.InputInt("Scale", ref _scale);
-        if (ImGui.IsItemDeactivatedAfterEdit())
+        ImGui.SliderFloat("Scale", ref _scale, 0.001f, 0.2f);
+        if (ImGui.IsItemEdited())
         {
             _map.GenMap(_scale);
         }
