@@ -22,7 +22,6 @@ public class Camera
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
         int keyY = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.S)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.W));
 
-
         _object.Target += new Vector2(keyX * SPEED * deltaTime, keyY * SPEED * deltaTime);
     }
 }

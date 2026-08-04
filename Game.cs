@@ -72,7 +72,7 @@ public class Game
         Raylib.BeginMode2D(_camera.Object);
 
         _manager.Render();
-        _map.Render();
+        _map.Render(_camera);
 
         Raylib.EndMode2D();
 

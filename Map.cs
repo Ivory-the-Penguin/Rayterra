@@ -1,13 +1,13 @@
 using System.Numerics;
 using Raylib_cs;
 using Rayterra.Core;
+using Rayterra.Helpers;
 
 namespace Rayterra;
 
 public class Map
 {
     private const int TILE_SIZE = 16;
-    private const int TILE_SCALE = 2;
 
     private const int WORLD_WIDTH = 1000;
     private const int WORLD_HEIGHT = 100;
@@ -50,14 +50,34 @@ public class Map
 
     }
 
-    public void Render()
+    public void Render(Camera camera)
     {
-        for (int i = 0; i < WORLD_WIDTH; i++)
+        Vector2 screenSize = Raylib.GetScreenCenter() * 2;
+
+        Vector2 viewMin = WorldToMapPosition(camera.Object.Target);
+        Vector2 viewSize = screenSize / camera.Object.Zoom / TILE_SIZE;
+
+        for (int i = Math.Max(0, (int)viewMin.X); i < viewMin.X + viewSize.X; i++)
         {
-            for (int j = 0; j < WORLD_HEIGHT; j++)
+            if (i >= _tiles.Count)
             {
-                _atlas.RenderTile((int)_tiles[i][j], new Vector2(i * TILE_SIZE + 100, j * TILE_SIZE + 100), 1);
+                break;
+            }
+
+            for (int j = Math.Max(0, (int)viewMin.Y); j < viewMin.Y + viewSize.Y; j++)
+            {
+                if (j >= _tiles[i].Count)
+                {
+                    break;
+                }
+
+                _atlas.RenderTile((int)_tiles[i][j], new Vector2(i * TILE_SIZE, j * TILE_SIZE), 1);
             }
         }
+    }
+
+    public Vector2 WorldToMapPosition(Vector2 position)
+    {
+        return position / TILE_SIZE;
     }
 }
