@@ -7,7 +7,7 @@ namespace Rayterra;
 
 public class Map
 {
-    private const int TILE_SIZE = 16;
+    private const int TILE_SIZE = 8;
 
     private const int WORLD_WIDTH = 2100;
     private const int WORLD_HEIGHT = 600;
@@ -38,19 +38,23 @@ public class Map
     private const int GRASS_MAX_HEIGHT = 40;
     private const int GRASS_RANGE = 40;
 
-    public void GenMap(float scale)
+    private const int STONE_MAX_HEIGHT = 100;
+    private const int STONE_RANGE = 20;
+
+    public void GenMap(float dirtScale, float stoneScale)
     {
         ClearWorld();
 
-        Image perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, 1, 0, 0, scale);
+        // DIRT
+        Image perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, 1, 0, 0, dirtScale);
 
         for (int i = 0; i < WORLD_WIDTH; i++)
         {
-            int grassHeight = (int)((float)Raylib.GetImageColor(perlin, i, 0).R / 255 * GRASS_RANGE) + GRASS_MAX_HEIGHT;
+            int height = (int)((float)Raylib.GetImageColor(perlin, i, 0).R / 255 * GRASS_RANGE) + GRASS_MAX_HEIGHT;
 
-            for (int j = grassHeight; j < WORLD_HEIGHT; j++)
+            for (int j = height; j < WORLD_HEIGHT; j++)
             {
-                if (j == grassHeight)
+                if (j == height)
                 {
                     _tiles[i][j] = TileID.Grass;
                 }
@@ -61,6 +65,21 @@ public class Map
             }
         }
 
+        Raylib.UnloadImage(perlin);
+
+
+        // STONE
+        perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, 1, 0, 0, stoneScale);
+
+        for (int i = 0; i < WORLD_WIDTH; i++)
+        {
+            int height = (int)((float)Raylib.GetImageColor(perlin, i, 0).R / 255 * STONE_RANGE) + STONE_MAX_HEIGHT;
+
+            for (int j = height; j < WORLD_HEIGHT; j++)
+            {
+                _tiles[i][j] = TileID.Stone;
+            }
+        }
         Raylib.UnloadImage(perlin);
     }
 

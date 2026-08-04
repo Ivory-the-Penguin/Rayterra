@@ -10,7 +10,7 @@ public class Camera
     private Camera2D _object;
     public Camera2D Object => _object;
 
-    const int SPEED = 500;
+    const int SPEED = 1_000;
 
     public Camera()
     {

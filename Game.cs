@@ -47,7 +47,7 @@ public class Game
         _map = new();
         _camera = new();
 
-        _map.GenMap(_scale);
+        _map.GenMap(_dirtScale, _stoneScale);
     }
 
     private void Update()
@@ -89,7 +89,8 @@ public class Game
         Profiler.EndProfile();
     }
 
-    private float _scale = 0.008f;
+    private float _dirtScale = 0.008f;
+    private float _stoneScale = 0.03f;
 
     private void RenderDebugUI()
     {
@@ -100,10 +101,16 @@ public class Game
 
         ImGui.NewLine();
 
-        ImGui.SliderFloat("Scale", ref _scale, 0.001f, 0.2f);
+        ImGui.SliderFloat("Dirt Scale", ref _dirtScale, 0.001f, 0.2f);
         if (ImGui.IsItemEdited())
         {
-            _map.GenMap(_scale);
+            _map.GenMap(_dirtScale, _stoneScale);
+        }
+
+        ImGui.SliderFloat("Stone Scale", ref _stoneScale, 0.001f, 0.2f);
+        if (ImGui.IsItemEdited())
+        {
+            _map.GenMap(_dirtScale, _stoneScale);
         }
 
         ImGui.NewLine();
