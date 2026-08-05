@@ -19,9 +19,10 @@ public class Map
     public Map()
     {
         _atlas = Assets.InitAtlas("MapAtlas", "./Assets/RayterraAtlas.png", TILE_SIZE);
+        InitializeWorld();
     }
 
-    public void ClearWorld()
+    public void InitializeWorld()
     {
         _tiles = new(WORLD_WIDTH);
         for (int i = 0; i < WORLD_WIDTH; i++)
@@ -32,6 +33,17 @@ public class Map
                 column.Add(TileID.None);
             }
             _tiles.Add(column);
+        }
+    }
+
+    public void ClearWorld()
+    {
+        for (int i = 0; i < WORLD_WIDTH; i++)
+        {
+            for (int j = 0; j < WORLD_HEIGHT; j++)
+            {
+                _tiles[i][j] = TileID.None;
+            }
         }
     }
 
