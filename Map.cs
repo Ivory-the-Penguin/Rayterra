@@ -132,11 +132,7 @@ public class Map
 
     public void Render(Camera camera)
     {
-        MapPosition size = new MapPosition((int)(Raylib.GetScreenWidth() / camera.Object.Zoom / TILE_SIZE), (int)(Raylib.GetScreenHeight() / camera.Object.Zoom / TILE_SIZE));
-
-        MapView view = new MapView(WorldToMapPosition(camera.Object.Target), size.X + 1, size.Y + 2);
-
-        foreach (MapPosition position in view)
+        foreach (MapPosition position in GetCameraView(camera))
         {
             int lightToRGB = Math.Clamp((int)((float)GetLightValue(position) / LIGHT_VALUE_MAX * 255), 0, 255);
 
@@ -174,5 +170,12 @@ public class Map
         }
 
         return _lightValues[position.X][position.Y];
+    }
+
+    public MapView GetCameraView(Camera camera)
+    {
+        MapPosition size = new MapPosition((int)(Raylib.GetScreenWidth() / camera.Object.Zoom / TILE_SIZE), (int)(Raylib.GetScreenHeight() / camera.Object.Zoom / TILE_SIZE));
+
+        return new MapView(WorldToMapPosition(camera.Object.Target), size.X + 2, size.Y + 2);
     }
 }
