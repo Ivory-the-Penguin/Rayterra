@@ -21,7 +21,7 @@ public class TextureAtlas
         _atlasHeight = _atlas.Height / _tileSize;
     }
 
-    public void RenderTile(int tileX, int tileY, Vector2 position, float scale)
+    public void RenderTile(int tileX, int tileY, Vector2 position, float scale, Color tint)
     {
         Rectangle source = new()
         {
@@ -39,10 +39,10 @@ public class TextureAtlas
             Height = scale * _tileSize
         };
 
-        Raylib.DrawTexturePro(_atlas, source, dest, new Vector2(0, 0), 0, Color.White);
+        Raylib.DrawTexturePro(_atlas, source, dest, new Vector2(0, 0), 0, tint);
     }
 
-    public void RenderTile(int id, Vector2 position, float scale)
+    public void RenderTile(int id, Vector2 position, float scale, Color tint)
     {
         if (id < 0)
         {
@@ -52,6 +52,6 @@ public class TextureAtlas
         int y = id / _atlasWidth;
         int x = id % _atlasWidth;
 
-        RenderTile(x, y, position, scale);
+        RenderTile(x, y, position, scale, tint);
     }
 }

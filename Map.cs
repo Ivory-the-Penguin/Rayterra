@@ -15,7 +15,7 @@ public class Map
     private TextureAtlas _atlas;
 
     private List<List<TileID>> _tiles = null!;
-    private List<List<byte>> _lightValues = null!;
+    private List<List<int>> _lightValues = null!;
 
     public Map()
     {
@@ -36,10 +36,10 @@ public class Map
             _tiles.Add(column);
         }
 
-        _lightValues = new List<List<byte>>(WORLD_WIDTH);
+        _lightValues = new List<List<int>>(WORLD_WIDTH);
         for (int i = 0; i < WORLD_WIDTH; i++)
         {
-            List<byte> column = new(WORLD_HEIGHT);
+            List<int> column = new(WORLD_HEIGHT);
             for (int j = 0; j < WORLD_HEIGHT; j++)
             {
                 column.Add(0);
@@ -66,6 +66,7 @@ public class Map
     private const int STONE_RANGE = 20;
 
     private const int CAVE_MAX_HEIGHT = 130;
+
 
     public void GenMap(float dirtScale, float stoneScale, float caveScale, float caveExposure)
     {
@@ -124,6 +125,8 @@ public class Map
         Raylib.UnloadImage(perlin);
     }
 
+    private const int LIGHT_VALUE_MAX = 10;
+
     public void Render(Camera camera)
     {
         Vector2 screenSize = Raylib.GetScreenCenter() * 2;
@@ -145,7 +148,9 @@ public class Map
                     break;
                 }
 
-                _atlas.RenderTile((int)_tiles[i][j], new Vector2(i * TILE_SIZE, j * TILE_SIZE), 1);
+                int lightToRGB = Math.Clamp((int)((float)_lightValues[i][j] / LIGHT_VALUE_MAX * 255), 0, 255);
+
+                _atlas.RenderTile((int)_tiles[i][j], new Vector2(i * TILE_SIZE, j * TILE_SIZE), 1, new Color(lightToRGB, lightToRGB, lightToRGB));
             }
         }
 
