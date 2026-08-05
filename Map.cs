@@ -26,6 +26,8 @@ public class Map
 
     public void InitializeWorld()
     {
+        _worldView = new MapView(new MapPosition(0, 0), WORLD_WIDTH, WORLD_HEIGHT);
+
         _tiles = new List<List<TileID>>(WORLD_WIDTH);
         for (int i = 0; i < WORLD_WIDTH; i++)
         {
@@ -43,22 +45,20 @@ public class Map
             List<int> column = new(WORLD_HEIGHT);
             for (int j = 0; j < WORLD_HEIGHT; j++)
             {
-                column.Add(1);
+                column.Add(0);
             }
             _lightValues.Add(column);
         }
 
-        _worldView = new MapView(new MapPosition(0, 0), WORLD_WIDTH, WORLD_HEIGHT);
+        ClearWorld();
     }
 
     public void ClearWorld()
     {
-        for (int i = 0; i < WORLD_WIDTH; i++)
+        foreach (MapPosition position in _worldView)
         {
-            for (int j = 0; j < WORLD_HEIGHT; j++)
-            {
-                _tiles[i][j] = TileID.None;
-            }
+            SetTile(position, TileID.Air);
+            SetLightValue(position, 0);
         }
     }
 
@@ -119,16 +119,68 @@ public class Map
         {
             if (Raylib.GetImageColor(perlin, position.X, position.Y - CAVE_MAX_HEIGHT).R > (int)(caveExposure * 255))
             {
-                SetTile(position, TileID.None);
+                SetTile(position, TileID.Air);
             }
         }
 
         Raylib.UnloadImage(perlin);
+
+        // LIGHT
+        SimulateLight(_worldView);
     }
 
-    public void SimulateLight(Vector2 viewMin, Vector2 viewSize)
+    public void SimulateLight(MapView view)
     {
-        Queue<(int x, int y)> lighting = new();
+        Queue<(MapPosition Position, int Light)> queue = new();
+
+        foreach (MapPosition position in view)
+        {
+            if (GetTile(position) == TileID.Air)
+            {
+                queue.Enqueue((position, LIGHT_VALUE_MAX));
+            }
+        }
+
+        MapPosition neighbor;
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+
+            if (GetLightValue(current.Position) >= current.Light)
+            {
+                continue;
+            }
+
+            if (current.Light == 1)
+            {
+                continue;
+            }
+
+            SetLightValue(current.Position, current.Light);
+
+            neighbor = new MapPosition(current.Position.X + 1, current.Position.Y);
+            if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
+            {
+                queue.Enqueue((neighbor, current.Light - 1));
+            }
+            neighbor = new MapPosition(current.Position.X - 1, current.Position.Y);
+            if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
+            {
+                queue.Enqueue((neighbor, current.Light - 1));
+            }
+
+            neighbor = new MapPosition(current.Position.X, current.Position.Y + 1);
+            if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
+            {
+                queue.Enqueue((neighbor, current.Light - 1));
+            }
+            neighbor = new MapPosition(current.Position.X, current.Position.Y - 1);
+            if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
+            {
+                queue.Enqueue((neighbor, current.Light - 1));
+            }
+        }
     }
 
     private const int LIGHT_VALUE_MAX = 10;
@@ -141,7 +193,7 @@ public class Map
 
             TileID tile = GetTile(position);
 
-            if (tile != TileID.None)
+            if (tile != TileID.Air)
             {
                 _atlas.RenderTile((int)tile, new Vector2(position.X * TILE_SIZE, position.Y * TILE_SIZE), 1, new Color(lightToRGB, lightToRGB, lightToRGB));
             }
@@ -200,5 +252,20 @@ public class Map
         MapPosition size = new MapPosition((int)(Raylib.GetScreenWidth() / camera.Object.Zoom / TILE_SIZE), (int)(Raylib.GetScreenHeight() / camera.Object.Zoom / TILE_SIZE));
 
         return new MapView(WorldToMapPosition(camera.Object.Target), size.X + 2, size.Y + 2);
+    }
+
+    public bool IsInMap(MapPosition position)
+    {
+        if (position.X < 0 || position.Y < 0)
+        {
+            return false;
+        }
+
+        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

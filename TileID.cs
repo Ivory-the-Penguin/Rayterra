@@ -2,7 +2,8 @@ namespace Rayterra;
 
 public enum TileID
 {
-    None = -1,
+    None = -2,
+    Air,
     Grass,
     Dirt,
     Stone
