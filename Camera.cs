@@ -14,7 +14,7 @@ public class Camera
 
     public Camera()
     {
-        _object = new(Vector2.Zero, Vector2.Zero, 0, 3);
+        _object = new(Vector2.Zero, Vector2.Zero, 0, 2);
     }
 
     public void Update(float deltaTime)

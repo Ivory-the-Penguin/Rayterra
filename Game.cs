@@ -47,7 +47,7 @@ public class Game
         _map = new();
         _camera = new();
 
-        _map.GenMap(_dirtScale, _stoneScale);
+        _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
     }
 
     private void Update()
@@ -91,6 +91,8 @@ public class Game
 
     private float _dirtScale = 0.008f;
     private float _stoneScale = 0.03f;
+    private float _caveScale = 10.0f;
+    private float _caveExposure = 0.5f;
 
     private void RenderDebugUI()
     {
@@ -104,13 +106,27 @@ public class Game
         ImGui.SliderFloat("Dirt Scale", ref _dirtScale, 0.001f, 0.2f);
         if (ImGui.IsItemEdited())
         {
-            _map.GenMap(_dirtScale, _stoneScale);
+            _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
         }
 
         ImGui.SliderFloat("Stone Scale", ref _stoneScale, 0.001f, 0.2f);
         if (ImGui.IsItemEdited())
         {
-            _map.GenMap(_dirtScale, _stoneScale);
+            _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
+        }
+
+        ImGui.NewLine();
+
+        ImGui.SliderFloat("Cave Scale", ref _caveScale, 1.0f, 20.0f);
+        if (ImGui.IsItemEdited())
+        {
+            _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
+        }
+
+        ImGui.SliderFloat("Cave Exposure", ref _caveExposure, 0.1f, 1.0f);
+        if (ImGui.IsItemEdited())
+        {
+            _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
         }
 
         ImGui.NewLine();

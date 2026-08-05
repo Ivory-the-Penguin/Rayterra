@@ -53,7 +53,9 @@ public class Map
     private const int STONE_MAX_HEIGHT = 100;
     private const int STONE_RANGE = 20;
 
-    public void GenMap(float dirtScale, float stoneScale)
+    private const int CAVE_MAX_HEIGHT = 130;
+
+    public void GenMap(float dirtScale, float stoneScale, float caveScale, float caveExposure)
     {
         ClearWorld();
 
@@ -90,6 +92,21 @@ public class Map
             for (int j = height; j < WORLD_HEIGHT; j++)
             {
                 _tiles[i][j] = TileID.Stone;
+            }
+        }
+        Raylib.UnloadImage(perlin);
+
+        // CAVES
+        perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, WORLD_HEIGHT - CAVE_MAX_HEIGHT, 0, 0, caveScale);
+
+        for (int i = 0; i < WORLD_WIDTH; i++)
+        {
+            for (int j = CAVE_MAX_HEIGHT; j < WORLD_HEIGHT; j++)
+            {
+                if (Raylib.GetImageColor(perlin, i, j - CAVE_MAX_HEIGHT).R > (int)(caveExposure * 255))
+                {
+                    _tiles[i][j] = TileID.None;
+                }
             }
         }
         Raylib.UnloadImage(perlin);
