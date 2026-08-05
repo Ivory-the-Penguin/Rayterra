@@ -16,6 +16,8 @@ public class Map
     private List<List<TileID>> _tiles = null!;
     private List<List<int>> _lightValues = null!;
 
+    private MapView _worldView;
+
     public Map()
     {
         _atlas = Assets.InitAtlas("MapAtlas", "./Assets/RayterraAtlas.png", TILE_SIZE);
@@ -45,6 +47,8 @@ public class Map
             }
             _lightValues.Add(column);
         }
+
+        _worldView = new MapView(new MapPosition(0, 0), WORLD_WIDTH, WORLD_HEIGHT);
     }
 
     public void ClearWorld()
@@ -110,16 +114,15 @@ public class Map
         // CAVES
         perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, WORLD_HEIGHT - CAVE_MAX_HEIGHT, 0, 0, caveScale);
 
-        for (int x = 0; x < WORLD_WIDTH; x++)
+        MapView caveView = new MapView(new MapPosition(0, CAVE_MAX_HEIGHT), WORLD_WIDTH, WORLD_HEIGHT - CAVE_MAX_HEIGHT);
+        foreach (MapPosition position in caveView)
         {
-            for (int y = CAVE_MAX_HEIGHT; y < WORLD_HEIGHT; y++)
+            if (Raylib.GetImageColor(perlin, position.X, position.Y - CAVE_MAX_HEIGHT).R > (int)(caveExposure * 255))
             {
-                if (Raylib.GetImageColor(perlin, x, y - CAVE_MAX_HEIGHT).R > (int)(caveExposure * 255))
-                {
-                    _tiles[x][y] = TileID.None;
-                }
+                SetTile(position, TileID.None);
             }
         }
+
         Raylib.UnloadImage(perlin);
     }
 
@@ -162,6 +165,16 @@ public class Map
         return _tiles[position.X][position.Y];
     }
 
+    public void SetTile(MapPosition position, TileID value)
+    {
+        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        {
+            return;
+        }
+
+        _tiles[position.X][position.Y] = value;
+    }
+
     public int GetLightValue(MapPosition position)
     {
         if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
@@ -170,6 +183,16 @@ public class Map
         }
 
         return _lightValues[position.X][position.Y];
+    }
+
+    public void SetLightValue(MapPosition position, int value)
+    {
+        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        {
+            return;
+        }
+
+        _lightValues[position.X][position.Y] = value;
     }
 
     public MapView GetCameraView(Camera camera)
