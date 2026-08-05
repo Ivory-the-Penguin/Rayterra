@@ -1,7 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
 using Rayterra.Core;
-using Rayterra.Helpers;
 
 namespace Rayterra;
 
@@ -42,7 +41,7 @@ public class Map
             List<int> column = new(WORLD_HEIGHT);
             for (int j = 0; j < WORLD_HEIGHT; j++)
             {
-                column.Add(0);
+                column.Add(1);
             }
             _lightValues.Add(column);
         }
@@ -67,7 +66,6 @@ public class Map
 
     private const int CAVE_MAX_HEIGHT = 130;
 
-
     public void GenMap(float dirtScale, float stoneScale, float caveScale, float caveExposure)
     {
         ClearWorld();
@@ -75,19 +73,19 @@ public class Map
         // DIRT
         Image perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, 1, 0, 0, dirtScale);
 
-        for (int i = 0; i < WORLD_WIDTH; i++)
+        for (int x = 0; x < WORLD_WIDTH; x++)
         {
-            int height = (int)((float)Raylib.GetImageColor(perlin, i, 0).R / 255 * GRASS_RANGE) + GRASS_MAX_HEIGHT;
+            int height = (int)((float)Raylib.GetImageColor(perlin, x, 0).R / 255 * GRASS_RANGE) + GRASS_MAX_HEIGHT;
 
-            for (int j = height; j < WORLD_HEIGHT; j++)
+            for (int y = height; y < WORLD_HEIGHT; y++)
             {
-                if (j == height)
+                if (y == height)
                 {
-                    _tiles[i][j] = TileID.Grass;
+                    _tiles[x][y] = TileID.Grass;
                 }
                 else
                 {
-                    _tiles[i][j] = TileID.Dirt;
+                    _tiles[x][y] = TileID.Dirt;
                 }
             }
         }
@@ -98,13 +96,13 @@ public class Map
         // STONE
         perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, 1, 0, 0, stoneScale);
 
-        for (int i = 0; i < WORLD_WIDTH; i++)
+        for (int x = 0; x < WORLD_WIDTH; x++)
         {
-            int height = (int)((float)Raylib.GetImageColor(perlin, i, 0).R / 255 * STONE_RANGE) + STONE_MAX_HEIGHT;
+            int height = (int)((float)Raylib.GetImageColor(perlin, x, 0).R / 255 * STONE_RANGE) + STONE_MAX_HEIGHT;
 
-            for (int j = height; j < WORLD_HEIGHT; j++)
+            for (int y = height; y < WORLD_HEIGHT; y++)
             {
-                _tiles[i][j] = TileID.Stone;
+                _tiles[x][y] = TileID.Stone;
             }
         }
         Raylib.UnloadImage(perlin);
@@ -112,53 +110,69 @@ public class Map
         // CAVES
         perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, WORLD_HEIGHT - CAVE_MAX_HEIGHT, 0, 0, caveScale);
 
-        for (int i = 0; i < WORLD_WIDTH; i++)
+        for (int x = 0; x < WORLD_WIDTH; x++)
         {
-            for (int j = CAVE_MAX_HEIGHT; j < WORLD_HEIGHT; j++)
+            for (int y = CAVE_MAX_HEIGHT; y < WORLD_HEIGHT; y++)
             {
-                if (Raylib.GetImageColor(perlin, i, j - CAVE_MAX_HEIGHT).R > (int)(caveExposure * 255))
+                if (Raylib.GetImageColor(perlin, x, y - CAVE_MAX_HEIGHT).R > (int)(caveExposure * 255))
                 {
-                    _tiles[i][j] = TileID.None;
+                    _tiles[x][y] = TileID.None;
                 }
             }
         }
         Raylib.UnloadImage(perlin);
     }
 
+    public void SimulateLight(Vector2 viewMin, Vector2 viewSize)
+    {
+        Queue<(int x, int y)> lighting = new();
+    }
+
     private const int LIGHT_VALUE_MAX = 10;
 
     public void Render(Camera camera)
     {
-        Vector2 screenSize = Raylib.GetScreenCenter() * 2;
+        MapPosition size = new MapPosition((int)(Raylib.GetScreenWidth() / camera.Object.Zoom / TILE_SIZE), (int)(Raylib.GetScreenHeight() / camera.Object.Zoom / TILE_SIZE));
 
-        Vector2 viewMin = WorldToMapPosition(camera.Object.Target);
-        Vector2 viewSize = screenSize / camera.Object.Zoom / TILE_SIZE;
+        MapView view = new MapView(WorldToMapPosition(camera.Object.Target), size.X + 1, size.Y + 2);
 
-        for (int i = Math.Max(0, (int)viewMin.X); i < viewMin.X + viewSize.X; i++)
+        foreach (MapPosition position in view)
         {
-            if (i >= _tiles.Count)
+            int lightToRGB = Math.Clamp((int)((float)GetLightValue(position) / LIGHT_VALUE_MAX * 255), 0, 255);
+
+            TileID tile = GetTile(position);
+
+            if (tile != TileID.None)
             {
-                break;
-            }
-
-            for (int j = Math.Max(0, (int)viewMin.Y); j < viewMin.Y + viewSize.Y; j++)
-            {
-                if (j >= _tiles[i].Count)
-                {
-                    break;
-                }
-
-                int lightToRGB = Math.Clamp((int)((float)_lightValues[i][j] / LIGHT_VALUE_MAX * 255), 0, 255);
-
-                _atlas.RenderTile((int)_tiles[i][j], new Vector2(i * TILE_SIZE, j * TILE_SIZE), 1, new Color(lightToRGB, lightToRGB, lightToRGB));
+                _atlas.RenderTile((int)tile, new Vector2(position.X * TILE_SIZE, position.Y * TILE_SIZE), 1, new Color(lightToRGB, lightToRGB, lightToRGB));
             }
         }
 
         Raylib.DrawRectangleLines(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE, Color.Red);
     }
 
-    public Vector2 WorldToMapPosition(Vector2 position)
+    public MapPosition WorldToMapPosition(Vector2 position)
     {
-        return position / TILE_SIZE;
+        return new MapPosition(Math.Max(0, (int)(position.X / TILE_SIZE)), Math.Max(0, (int)(position.Y / TILE_SIZE)));
+    }
+
+    public TileID GetTile(MapPosition position)
+    {
+        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        {
+            return TileID.None;
+        }
+
+        return _tiles[position.X][position.Y];
+    }
+
+    public int GetLightValue(MapPosition position)
+    {
+        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        {
+            return -1;
+        }
+
+        return _lightValues[position.X][position.Y];
     }
 }
