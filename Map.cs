@@ -15,6 +15,7 @@ public class Map
     private TextureAtlas _atlas;
 
     private List<List<TileID>> _tiles = null!;
+    private List<List<byte>> _lightValues = null!;
 
     public Map()
     {
@@ -24,7 +25,7 @@ public class Map
 
     public void InitializeWorld()
     {
-        _tiles = new(WORLD_WIDTH);
+        _tiles = new List<List<TileID>>(WORLD_WIDTH);
         for (int i = 0; i < WORLD_WIDTH; i++)
         {
             List<TileID> column = new(WORLD_HEIGHT);
@@ -33,6 +34,17 @@ public class Map
                 column.Add(TileID.None);
             }
             _tiles.Add(column);
+        }
+
+        _lightValues = new List<List<byte>>(WORLD_WIDTH);
+        for (int i = 0; i < WORLD_WIDTH; i++)
+        {
+            List<byte> column = new(WORLD_HEIGHT);
+            for (int j = 0; j < WORLD_HEIGHT; j++)
+            {
+                column.Add(0);
+            }
+            _lightValues.Add(column);
         }
     }
 

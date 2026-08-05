@@ -69,7 +69,7 @@ public class Game
 
         Raylib.BeginDrawing();
 
-        Raylib.ClearBackground(Color.Black);
+        Raylib.ClearBackground(Color.SkyBlue);
 
         Raylib.BeginMode2D(_camera.Object);
 
@@ -91,8 +91,8 @@ public class Game
 
     private float _dirtScale = 0.008f;
     private float _stoneScale = 0.03f;
-    private float _caveScale = 10.0f;
-    private float _caveExposure = 0.5f;
+    private float _caveScale = 13.2f;
+    private float _caveExposure = 0.55f;
 
     private void RenderDebugUI()
     {

@@ -1,5 +1,5 @@
 Rayterra TODO
-- [ ] Add caves
+- [X] Add caves
 - [ ] Add lighting
 - [ ] Basic player controls
 - [ ] Def tables (uh oh)
