@@ -8,7 +8,20 @@ namespace Rayterra;
 public class Camera
 {
     private Camera2D _object;
-    public Camera2D Object => _object;
+
+    public Camera2D RaylibCamera => _object;
+
+    public float Zoom
+    {
+        get => _object.Zoom;
+        set => _object.Zoom = value;
+    }
+
+    public Vector2 Position
+    {
+        get => _object.Target;
+        set => _object.Target = value;
+    }
 
     const int SPEED = 1_000;
 
@@ -17,7 +30,7 @@ public class Camera
         _object = new(Vector2.Zero, Vector2.Zero, 0, 2);
     }
 
-    public void Update(float deltaTime)
+    public void DebugUpdate(float deltaTime)
     {
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
         int keyY = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.S)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.W));

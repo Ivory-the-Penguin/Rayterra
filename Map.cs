@@ -184,7 +184,7 @@ public class Map
         }
     }
 
-    private const int LIGHT_VALUE_MAX = 9;
+    private const int LIGHT_VALUE_MAX = 8;
 
     public void Render(Camera camera)
     {
@@ -261,9 +261,9 @@ public class Map
 
     public MapView GetCameraView(Camera camera)
     {
-        MapPosition size = new MapPosition((int)(Raylib.GetScreenWidth() / camera.Object.Zoom / TILE_SIZE), (int)(Raylib.GetScreenHeight() / camera.Object.Zoom / TILE_SIZE));
+        MapPosition size = new MapPosition((int)(Raylib.GetScreenWidth() / camera.Zoom / TILE_SIZE), (int)(Raylib.GetScreenHeight() / camera.Zoom / TILE_SIZE));
 
-        return new MapView(WorldToMapPosition(camera.Object.Target), size.X + 2, size.Y + 2);
+        return new MapView(WorldToMapPosition(camera.Position), size.X + 2, size.Y + 2);
     }
 
     public bool IsInMap(MapPosition position)

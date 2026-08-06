@@ -18,7 +18,8 @@ public class Game
 
     private EntityManager _manager = null!;
     private Map _map = null!;
-    private Camera _camera = null!;
+
+    private Player _player = null!;
 
     public Game()
     {
@@ -26,6 +27,13 @@ public class Game
         LoadTextures();
 
         InitSystems();
+        InitEntities();
+    }
+    public void InitEntities()
+    {
+        _player = new();
+
+        _manager.AddEntity(_player);
     }
 
     private void InitWindow()
@@ -45,7 +53,6 @@ public class Game
     {
         _manager = new();
         _map = new();
-        _camera = new();
 
         _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
     }
@@ -58,8 +65,6 @@ public class Game
 
         _manager.Update(deltaTime);
 
-        _camera.Update(deltaTime);
-
         Profiler.EndProfile();
     }
 
@@ -71,10 +76,10 @@ public class Game
 
         Raylib.ClearBackground(Color.SkyBlue);
 
-        Raylib.BeginMode2D(_camera.Object);
+        Raylib.BeginMode2D(_player.Camera.RaylibCamera);
 
         _manager.Render();
-        _map.Render(_camera);
+        _map.Render(_player.Camera);
 
         Raylib.EndMode2D();
 
