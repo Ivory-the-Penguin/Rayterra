@@ -6,8 +6,6 @@ using Raylib_cs;
 using ImGuiNET;
 using rlImGui_cs;
 using Rayterra.Core;
-using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
 
 public class Game
 {

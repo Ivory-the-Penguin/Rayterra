@@ -79,7 +79,7 @@ public class Map
 
         for (int x = 0; x < WORLD_WIDTH; x++)
         {
-            int height = (int)((float)Raylib.GetImageColor(perlin, x, 0).R / 255 * GRASS_RANGE) + GRASS_MAX_HEIGHT;
+            int height = (int)(Raylib.ColorNormalize(Raylib.GetImageColor(perlin, x, 0)).X * GRASS_RANGE) + GRASS_MAX_HEIGHT;
 
             for (int y = height; y < WORLD_HEIGHT; y++)
             {
@@ -102,7 +102,7 @@ public class Map
 
         for (int x = 0; x < WORLD_WIDTH; x++)
         {
-            int height = (int)((float)Raylib.GetImageColor(perlin, x, 0).R / 255 * STONE_RANGE) + STONE_MAX_HEIGHT;
+            int height = (int)(Raylib.ColorNormalize(Raylib.GetImageColor(perlin, x, 0)).X * STONE_RANGE) + STONE_MAX_HEIGHT;
 
             for (int y = height; y < WORLD_HEIGHT; y++)
             {
@@ -117,7 +117,7 @@ public class Map
         MapView caveView = new MapView(new MapPosition(0, CAVE_MAX_HEIGHT), WORLD_WIDTH, WORLD_HEIGHT - CAVE_MAX_HEIGHT);
         foreach (MapPosition position in caveView)
         {
-            if (Raylib.GetImageColor(perlin, position.X, position.Y - CAVE_MAX_HEIGHT).R > (int)(caveExposure * 255))
+            if (Raylib.ColorNormalize(Raylib.GetImageColor(perlin, position.X, position.Y - CAVE_MAX_HEIGHT)).X > caveExposure)
             {
                 SetTile(position, TileID.Air);
             }
@@ -210,8 +210,8 @@ public class Map
 
     private Color LightValueToColor(int lightValue)
     {
-        int value = Math.Clamp((int)((float)lightValue / LIGHT_VALUE_MAX * 255), 0, 255);
-        return new Color(value, value, value);
+        float normalized = (float)lightValue / LIGHT_VALUE_MAX;
+        return Raylib.ColorFromNormalized(new Vector4(normalized, normalized, normalized, 1));
     }
 
     public MapPosition WorldToMapPosition(Vector2 position)
