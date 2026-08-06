@@ -14,7 +14,7 @@ public class Player : IEntity
     public Player()
     {
         Camera = new();
-        Body = new(new Vector2(100, 100), new Vector2(100, 200));
+        Body = new(new Vector2(100, 100), new Vector2(10, 20));
     }
 
     public void Update(float deltaTime, EntityManager manager)

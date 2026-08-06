@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace Rayterra.Helpers;
+namespace Rayterra.Core;
 
 public class AABB
 {
@@ -53,7 +53,9 @@ public class AABB
 
     public void RenderHitbox(Color color, float thickness)
     {
+#if DEBUG
         Raylib.DrawRectangleLinesEx(RayRect, thickness, color);
+#endif
     }
 
     public void RenderHitbox(Color color)
@@ -63,8 +65,6 @@ public class AABB
 
     public void RenderHitbox()
     {
-#if DEBUG
         RenderHitbox(Color.Red, 2);
-#endif
     }
 }
