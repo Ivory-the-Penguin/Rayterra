@@ -185,26 +185,27 @@ public class Map
 
     private const int LIGHT_VALUE_MAX = 9;
 
-    private float Exponent(float n)
-    {
-        return Math.Clamp(n, 0f, 1f);
-    }
-
     public void Render(Camera camera)
     {
         foreach (MapPosition position in GetCameraView(camera))
         {
-            int lightToRGB = Math.Clamp((int)(Exponent((float)GetLightValue(position) / LIGHT_VALUE_MAX) * 255), 0, 255);
+            Color lightColor = LightValueToColor(GetLightValue(position));
 
             TileID tile = GetTile(position);
 
             if (tile != TileID.Air)
             {
-                _atlas.RenderTile((int)tile, new Vector2(position.X * TILE_SIZE, position.Y * TILE_SIZE), 1, new Color(lightToRGB, lightToRGB, lightToRGB));
+                _atlas.RenderTile((int)tile, new Vector2(position.X * TILE_SIZE, position.Y * TILE_SIZE), 1, lightColor);
             }
         }
 
         Raylib.DrawRectangleLines(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE, Color.Red);
+    }
+
+    private Color LightValueToColor(int lightValue)
+    {
+        int value = Math.Clamp((int)((float)lightValue / LIGHT_VALUE_MAX * 255), 0, 255);
+        return new Color(value, value, value);
     }
 
     public MapPosition WorldToMapPosition(Vector2 position)
