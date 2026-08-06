@@ -215,12 +215,12 @@ public class Map
 
     public MapPosition WorldToMapPosition(Vector2 position)
     {
-        return new MapPosition(Math.Max(0, (int)(position.X / TILE_SIZE)), Math.Max(0, (int)(position.Y / TILE_SIZE)));
+        return new MapPosition(Math.Clamp((int)(position.X / TILE_SIZE), 0, WORLD_WIDTH), Math.Clamp((int)(position.Y / TILE_SIZE), 0, WORLD_HEIGHT));
     }
 
     public TileID GetTile(MapPosition position)
     {
-        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        if (!IsInMap(position))
         {
             return TileID.None;
         }
@@ -230,7 +230,7 @@ public class Map
 
     public void SetTile(MapPosition position, TileID value)
     {
-        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        if (!IsInMap(position))
         {
             return;
         }
@@ -240,7 +240,7 @@ public class Map
 
     public int GetLightValue(MapPosition position)
     {
-        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        if (!IsInMap(position))
         {
             return -1;
         }
@@ -250,7 +250,7 @@ public class Map
 
     public void SetLightValue(MapPosition position, int value)
     {
-        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        if (!IsInMap(position))
         {
             return;
         }
