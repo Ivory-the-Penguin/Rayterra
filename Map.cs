@@ -152,12 +152,13 @@ public class Map
                 continue;
             }
 
+
+            SetLightValue(current.Position, current.Light);
+
             if (current.Light == 1)
             {
                 continue;
             }
-
-            SetLightValue(current.Position, current.Light);
 
             neighbor = new MapPosition(current.Position.X + 1, current.Position.Y);
             if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
@@ -215,7 +216,7 @@ public class Map
 
     public MapPosition WorldToMapPosition(Vector2 position)
     {
-        return new MapPosition(Math.Clamp((int)(position.X / TILE_SIZE), 0, WORLD_WIDTH), Math.Clamp((int)(position.Y / TILE_SIZE), 0, WORLD_HEIGHT));
+        return new MapPosition(Math.Clamp((int)(position.X / TILE_SIZE), 0, WORLD_WIDTH - 1), Math.Clamp((int)(position.Y / TILE_SIZE), 0, WORLD_HEIGHT - 1));
     }
 
     public TileID GetTile(MapPosition position)
