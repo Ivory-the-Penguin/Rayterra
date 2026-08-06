@@ -19,7 +19,7 @@ public static class Profiler
     {
         if (_stack.Count <= 0)
         {
-            throw new Exception("Profile stack is empty!");
+            throw new InvalidOperationException("Profile stack is empty!");
         }
 
         StackProfile profile = _stack.Pop();
@@ -30,4 +30,11 @@ public static class Profiler
     }
 
     public static Profile GetProfile(string name) => _profiles.GetValueOrDefault(name);
+}
+
+public class ProfilerScope : IDisposable
+{
+    public ProfilerScope(string name) => Profiler.BeginProfile(name);
+
+    public void Dispose() => Profiler.EndProfile();
 }

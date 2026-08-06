@@ -59,39 +59,35 @@ public class Game
 
     private void Update()
     {
-        Profiler.BeginProfile("update");
+        using (new ProfilerScope("update"))
+        {
+            float deltaTime = Raylib.GetFrameTime();
 
-        float deltaTime = Raylib.GetFrameTime();
-
-        _manager.Update(deltaTime);
-
-        Profiler.EndProfile();
+            _manager.Update(deltaTime);
+        }
     }
 
     private void Render()
     {
-        Profiler.BeginProfile("render");
+        using (new ProfilerScope("render"))
+        {
+            Raylib.BeginDrawing();
 
-        Raylib.BeginDrawing();
+            Raylib.ClearBackground(Color.SkyBlue);
 
-        Raylib.ClearBackground(Color.SkyBlue);
+            Raylib.BeginMode2D(_player.Camera.RaylibCamera);
 
-        Raylib.BeginMode2D(_player.Camera.RaylibCamera);
+            _manager.Render();
+            _map.Render(_player.Camera);
 
-        _manager.Render();
-        _map.Render(_player.Camera);
-
-        Raylib.EndMode2D();
+            Raylib.EndMode2D();
+        }
 
 #if DEBUG
-        RenderDebugUI();
+        using (new ProfilerScope("debug_render")) { RenderDebugUI(); }
 #endif
 
-        Profiler.EndProfile();
-
-        Profiler.BeginProfile("present");
-        Raylib.EndDrawing();
-        Profiler.EndProfile();
+        using (new ProfilerScope("present")) { Raylib.EndDrawing(); }
     }
 
     private float _dirtScale = 0.008f;
@@ -139,6 +135,7 @@ public class Game
         ImGui.Text($"Updating time: {Profiler.GetProfile("update").time} ms");
         ImGui.Text($"Rendering time: {Profiler.GetProfile("render").time} ms");
         ImGui.Text($"Present time: {Profiler.GetProfile("present").time} ms");
+        ImGui.Text($"Debug Render time: {Profiler.GetProfile("debug_render").time} ms");
 
         rlImGui.End();
     }
