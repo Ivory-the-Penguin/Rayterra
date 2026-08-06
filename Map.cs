@@ -183,13 +183,18 @@ public class Map
         }
     }
 
-    private const int LIGHT_VALUE_MAX = 10;
+    private const int LIGHT_VALUE_MAX = 9;
+
+    private float Exponent(float n)
+    {
+        return Math.Clamp(n, 0f, 1f);
+    }
 
     public void Render(Camera camera)
     {
         foreach (MapPosition position in GetCameraView(camera))
         {
-            int lightToRGB = Math.Clamp((int)((float)GetLightValue(position) / LIGHT_VALUE_MAX * 255), 0, 255);
+            int lightToRGB = Math.Clamp((int)(Exponent((float)GetLightValue(position) / LIGHT_VALUE_MAX) * 255), 0, 255);
 
             TileID tile = GetTile(position);
 
