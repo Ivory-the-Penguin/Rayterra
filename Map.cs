@@ -195,11 +195,16 @@ public class Map
 
             if (tile != TileID.Air)
             {
-                _atlas.RenderTile((int)tile, new Vector2(position.X * TILE_SIZE, position.Y * TILE_SIZE), 1, lightColor);
+                _atlas.RenderTile((int)tile, MapPositionToWorldPosition(position), 1, lightColor);
             }
         }
 
         Raylib.DrawRectangleLines(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE, Color.Red);
+    }
+
+    private Vector2 MapPositionToWorldPosition(MapPosition position)
+    {
+        return new Vector2(position.X * TILE_SIZE, position.Y * TILE_SIZE);
     }
 
     private Color LightValueToColor(int lightValue)
