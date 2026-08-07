@@ -14,6 +14,8 @@ public class AABB
 
     public Rectangle RayRect => new Rectangle(Position, Size);
 
+    public static AABB Zero => new AABB(Vector2.Zero, Vector2.Zero);
+
     public AABB(Vector2 position, Vector2 size)
     {
         Position = position;
@@ -33,6 +35,19 @@ public class AABB
         }
 
         return true;
+    }
+
+    public AABB GetCollisionRect(AABB other)
+    {
+        if (!Intersects(other))
+        {
+            return Zero;
+        }
+
+        Vector2 position = Vector2.Max(Min, other.Min);
+        Vector2 size = Vector2.Min(Max, other.Max) - position;
+
+        return new AABB(position, size);
     }
 
     public bool PointIntersects(Vector2 point)
@@ -66,5 +81,10 @@ public class AABB
     public void RenderHitbox()
     {
         RenderHitbox(Color.Red, 2);
+    }
+
+    public bool IsZero()
+    {
+        return Position == Vector2.Zero && Size == Vector2.Zero;
     }
 }

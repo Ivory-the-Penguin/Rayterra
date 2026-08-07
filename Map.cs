@@ -196,14 +196,31 @@ public class Map
 
             if (tile != TileID.Air)
             {
-                _atlas.RenderTile((int)tile, MapPositionToWorldPosition(position), 1, lightColor);
+                _atlas.RenderTile((int)tile, MapToWorldPosition(position), 1, lightColor);
             }
         }
 
         Raylib.DrawRectangleLines(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE, Color.Red);
     }
 
-    private Vector2 MapPositionToWorldPosition(MapPosition position)
+    public List<AABB> GetNearbyTileAABBs(AABB region)
+    {
+        MapView view = new MapView(WorldToMapPosition(region.Min), WorldToMapPosition(region.Max));
+
+        List<AABB> hitboxList = new();
+        foreach (MapPosition position in view)
+        {
+            if ((int)GetTile(position) < 0)
+            {
+                continue;
+            }
+            hitboxList.Add(new AABB(MapToWorldPosition(position), new Vector2(TILE_SIZE)));
+        }
+
+        return hitboxList;
+    }
+
+    private Vector2 MapToWorldPosition(MapPosition position)
     {
         return new Vector2(position.X * TILE_SIZE, position.Y * TILE_SIZE);
     }

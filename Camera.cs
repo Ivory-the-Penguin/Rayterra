@@ -30,7 +30,7 @@ public class Camera
         _object = new(Vector2.Zero, Vector2.Zero, 0, 2);
     }
 
-    public void DebugUpdate(float deltaTime)
+    public void FreeFlightUpdate(float deltaTime)
     {
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
         int keyY = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.S)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.W));

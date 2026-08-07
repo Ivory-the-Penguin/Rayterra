@@ -29,7 +29,7 @@ public class Game
     }
     public void InitEntities()
     {
-        _player = new();
+        _player = new(_map);
 
         _manager.AddEntity(_player);
     }
@@ -75,8 +75,8 @@ public class Game
 
             Raylib.BeginMode2D(_player.Camera.RaylibCamera);
 
-            _manager.Render();
             _map.Render(_player.Camera);
+            _manager.Render();
 
             Raylib.EndMode2D();
         }
