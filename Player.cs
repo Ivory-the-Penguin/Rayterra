@@ -16,32 +16,17 @@ public class Player : IEntity
 
     private Vector2 _velocity = new();
 
+    private AABB _collisionRange;
+
     private Map _map;
 
     public Player(Map map)
     {
         Body = new(new Vector2(400, 100), new Vector2(10, 20));
+
         _map = map;
+        _collisionRange = new();
     }
-
-    private AABB GetMapCollisionRect()
-    {
-        List<AABB> check = _map.GetNearbyTileAABBs(new AABB(Body.Center - new Vector2(40), new Vector2(80, 78)));
-
-        AABB rect = new(Vector2.PositiveInfinity, Vector2.NegativeInfinity);
-
-        foreach (AABB box in check)
-        {
-            if (Body.Intersects(box))
-            {
-                rect.Min = Vector2.Min(rect.Min, box.Min);
-                rect.Max = Vector2.Max(rect.Max, box.Max);
-            }
-        }
-
-        return rect.GetCollisionRect(Body);
-    }
-
 
     public void Update(float deltaTime, EntityManager manager)
     {
@@ -63,8 +48,11 @@ public class Player : IEntity
 
     private void HandleCollisions(Vector2 velocity)
     {
+        _collisionRange.Position = Body.Center - new Vector2(25);
+        _collisionRange.Size = new Vector2(50);
+
         Body.Position += velocity;
-        List<AABB> nearbyTileBoxes = _map.GetNearbyTileAABBs(new AABB(Body.Center - new Vector2(40), new Vector2(80, 78)));
+        List<AABB> nearbyTileBoxes = _map.GetNearbyTileAABBs(_collisionRange);
         foreach (AABB box in nearbyTileBoxes)
         {
             AABB cr = Body.GetCollisionRect(box);
@@ -92,5 +80,6 @@ public class Player : IEntity
     public void Render()
     {
         Body.RenderHitbox();
+        _collisionRange.RenderHitbox(Color.Magenta, 1);
     }
 }

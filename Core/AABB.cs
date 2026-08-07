@@ -30,6 +30,12 @@ public class AABB
         Size = size;
     }
 
+    public AABB()
+    {
+        Position = Vector2.Zero;
+        Size = Vector2.Zero;
+    }
+
     public bool Intersects(AABB other)
     {
         if (!(Min.X < other.Max.X && Max.X > other.Min.X))
