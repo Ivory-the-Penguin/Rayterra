@@ -44,6 +44,8 @@ public class Player : IEntity
         {
             HandleCollisions(_velocity / 10);
         }
+
+        Camera.Position = Body.Center - (Raylib.GetScreenCenter() / Camera.Zoom);
     }
 
     private void HandleCollisions(Vector2 velocity)
