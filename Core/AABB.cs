@@ -5,12 +5,20 @@ namespace Rayterra.Core;
 
 public class AABB
 {
-    public Vector2 Position { get; set; }
-    public Vector2 Size { get; set; }
+    public Vector2 Position;
+    public Vector2 Size;
 
     public Vector2 Center => (Min + Max) * 0.5f;
-    public Vector2 Min => Position;
-    public Vector2 Max => Position + Size;
+    public Vector2 Min
+    {
+        get => Position;
+        set => Position = value;
+    }
+    public Vector2 Max
+    {
+        get => Position + Size;
+        set => Size = Max - Position;
+    }
 
     public Rectangle RayRect => new Rectangle(Position, Size);
 

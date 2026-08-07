@@ -24,18 +24,22 @@ public class Player : IEntity
         _map = map;
     }
 
-    private bool TouchingMap()
+    private AABB GetMapCollisionRect()
     {
         List<AABB> check = _map.GetNearbyTileAABBs(new AABB(Body.Center - new Vector2(40), new Vector2(80, 78)));
+
+        AABB rect = new(Vector2.PositiveInfinity, Vector2.NegativeInfinity);
+
         foreach (AABB box in check)
         {
             if (Body.Intersects(box))
             {
-                return true;
+                rect.Min = Vector2.Min(rect.Min, box.Min);
+                rect.Max = Vector2.Max(rect.Max, box.Max);
             }
         }
 
-        return false;
+        return rect.GetCollisionRect(Body);
     }
 
 
@@ -48,36 +52,39 @@ public class Player : IEntity
             _velocity.Y = -3f;
         }
 
-        int loopAmount = (int)Math.Round(Math.Abs(_velocity.Y));
-        for (int i = 0; i < loopAmount; i++)
-        {
-            Vector2 difference = new Vector2(0, _velocity.Y / loopAmount);
-
-            Body.Position += difference;
-
-            if (TouchingMap())
-            {
-                Body.Position -= difference;
-                _velocity.Y = 0;
-                return;
-            }
-        }
-
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
         _velocity.X = keyX * SPEED * deltaTime;
 
-        loopAmount = (int)Math.Round(Math.Abs(_velocity.X));
-        for (int i = 0; i < loopAmount; i++)
+        for (int i = 0; i < 10; i++)
         {
-            Vector2 difference = new Vector2(_velocity.X / loopAmount, 0);
+            HandleCollisions(_velocity / 10);
+        }
+    }
 
-            Body.Position += difference;
-
-            if (TouchingMap())
+    private void HandleCollisions(Vector2 velocity)
+    {
+        Body.Position += velocity;
+        List<AABB> nearbyTileBoxes = _map.GetNearbyTileAABBs(new AABB(Body.Center - new Vector2(40), new Vector2(80, 78)));
+        foreach (AABB box in nearbyTileBoxes)
+        {
+            AABB cr = Body.GetCollisionRect(box);
+            if (cr.IsZero()) continue;
+            if (cr.Size.X > cr.Size.Y)
             {
-                Body.Position -= difference;
+                if (cr.Center.Y > Body.Center.Y)
+                    Body.Position.Y -= cr.Size.Y;
+                else
+                    Body.Position.Y += cr.Size.Y;
+                _velocity.Y = 0;
+            }
+            else
+            {
+                if (cr.Center.X > Body.Center.X)
+                    Body.Position.X -= cr.Size.X;
+                else
+                    Body.Position.X += cr.Size.X;
                 _velocity.X = 0;
-                return;
+
             }
         }
     }
