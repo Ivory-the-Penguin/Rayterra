@@ -11,7 +11,7 @@ public class Player : IEntity
 
     public AABB Body { get; private set; }
 
-    private const float GRAVITY = 2;
+    private const float GRAVITY = 10f;
     private const float SPEED = 100;
 
     private Vector2 _velocity = new();
@@ -26,7 +26,7 @@ public class Player : IEntity
 
     private bool TouchingMap()
     {
-        List<AABB> check = _map.GetNearbyTileAABBs(new AABB(Body.Center - new Vector2(40), new Vector2(80)));
+        List<AABB> check = _map.GetNearbyTileAABBs(new AABB(Body.Center - new Vector2(40), new Vector2(80, 78)));
         foreach (AABB box in check)
         {
             if (Body.Intersects(box))
@@ -43,22 +43,40 @@ public class Player : IEntity
     {
         _velocity.Y += GRAVITY * deltaTime;
 
-        int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
-        _velocity.X = keyX * SPEED * deltaTime;
+        if (Input.IsKeyDown(KeyboardKey.Space))
+        {
+            _velocity.Y = -3f;
+        }
 
-        Body.Position += new Vector2(_velocity.X, 0);
-
-        int loopAmount = (int)Math.Round(_velocity.Y);
+        int loopAmount = (int)Math.Round(Math.Abs(_velocity.Y));
         for (int i = 0; i < loopAmount; i++)
         {
-            Vector2 dy = new Vector2(0, _velocity.Y / loopAmount);
+            Vector2 difference = new Vector2(0, _velocity.Y / loopAmount);
 
-            Body.Position += dy;
+            Body.Position += difference;
 
             if (TouchingMap())
             {
-                Body.Position -= dy;
+                Body.Position -= difference;
                 _velocity.Y = 0;
+                return;
+            }
+        }
+
+        int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
+        _velocity.X = keyX * SPEED * deltaTime;
+
+        loopAmount = (int)Math.Round(Math.Abs(_velocity.X));
+        for (int i = 0; i < loopAmount; i++)
+        {
+            Vector2 difference = new Vector2(_velocity.X / loopAmount, 0);
+
+            Body.Position += difference;
+
+            if (TouchingMap())
+            {
+                Body.Position -= difference;
+                _velocity.X = 0;
                 return;
             }
         }

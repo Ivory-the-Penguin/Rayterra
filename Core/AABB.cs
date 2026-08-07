@@ -24,12 +24,12 @@ public class AABB
 
     public bool Intersects(AABB other)
     {
-        if (!(Min.X <= other.Max.X && Max.X >= other.Min.X))
+        if (!(Min.X < other.Max.X && Max.X > other.Min.X))
         {
             return false;
         }
 
-        if (!(Min.Y <= other.Max.Y && Max.Y >= other.Min.Y))
+        if (!(Min.Y < other.Max.Y && Max.Y > other.Min.Y))
         {
             return false;
         }
@@ -52,12 +52,12 @@ public class AABB
 
     public bool PointIntersects(Vector2 point)
     {
-        if (!(point.X >= Min.X && point.X <= Max.X))
+        if (!(point.X > Min.X && point.X < Max.X))
         {
             return false;
         }
 
-        if (!(point.Y >= Min.Y && point.Y <= Max.Y))
+        if (!(point.Y > Min.Y && point.Y < Max.Y))
         {
             return false;
         }
