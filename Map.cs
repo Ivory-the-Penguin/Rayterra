@@ -195,6 +195,15 @@ public class Map
         return tile;
     }
 
+    public void PlaceTile(MapPosition position, TileID tile)
+    {
+        SetTile(position, tile);
+
+        SimulateLight(new MapView(
+            new MapPosition(position.X - LIGHT_VALUE_MAX, position.Y - LIGHT_VALUE_MAX),
+            new MapPosition(position.X + LIGHT_VALUE_MAX, position.Y + LIGHT_VALUE_MAX)));
+    }
+
     private const int LIGHT_VALUE_MAX = 8;
 
     public void Render(Camera camera)

@@ -43,7 +43,7 @@ public class Player : IEntity
         HandleYMovement(deltaTime);
         HandleXMovement(deltaTime);
 
-        HandleBlockBreaking();
+        HandleBlockStuff();
 
         for (int i = 0; i < 10; i++)
         {
@@ -53,13 +53,28 @@ public class Player : IEntity
         Camera.Position = Body.Center - (Raylib.GetScreenCenter() / Camera.Zoom);
     }
 
-    private void HandleBlockBreaking()
+    private void HandleBlockStuff()
     {
         _selected = _map.WorldToMapPosition(Camera.MousePosition);
 
-        if (Input.IsMouseButtonDown(MouseButton.Left) && Vector2.Distance(Body.Center, Camera.MousePosition) < Map.TileSize * TileRange)
+        if (Vector2.Distance(Body.Center, Camera.MousePosition) < Map.TileSize * TileRange)
         {
-            _map.BreakTile(_selected);
+            if (Input.IsMouseButtonPressed(MouseButton.Left))
+            {
+                if (_map.GetTile(_selected) == TileID.Air)
+                {
+                    _map.PlaceTile(_selected, TileID.Dirt);
+                    if (IsColliding())
+                    {
+                        _map.BreakTile(_selected);
+                    }
+                }
+                else
+                {
+                    _map.BreakTile(_selected);
+                }
+            }
+
         }
     }
 
@@ -121,6 +136,23 @@ public class Player : IEntity
 
             }
         }
+    }
+
+    private bool IsColliding()
+    {
+        _collisionRange.Position = Body.Center - new Vector2(25);
+        _collisionRange.Size = new Vector2(50);
+
+        List<AABB> nearbyTileBoxes = _map.GetNearbyTileAABBs(_collisionRange);
+        foreach (AABB box in nearbyTileBoxes)
+        {
+            AABB collisionRect = Body.GetCollisionRect(box);
+            if (collisionRect.IsZero()) continue;
+
+            return true;
+        }
+
+        return false;
     }
 
     public void Render()
