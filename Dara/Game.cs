@@ -1,4 +1,4 @@
-namespace Rayterra.Core;
+namespace Dara;
 
 using Entity;
 

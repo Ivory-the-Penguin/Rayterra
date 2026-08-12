@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace Rayterra.Core;
+namespace Dara;
 
 public class TextureAtlas
 {

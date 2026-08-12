@@ -1,4 +1,4 @@
-namespace Rayterra.Core.Entity;
+namespace Dara.Entity;
 
 public class EntityManager
 {

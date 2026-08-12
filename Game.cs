@@ -1,12 +1,12 @@
 using Raylib_cs;
 using ImGuiNET;
 using rlImGui_cs;
-using Rayterra.Core;
+using Dara;
 using Rayterra.World;
 
 namespace Rayterra;
 
-public class Game : Core.Game
+public class Game : Dara.Game
 {
     override protected string WindowTitle => "Rayterra";
 

@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
-using Rayterra.Core.Entity;
-using Rayterra.Core;
+using Dara.Entity;
+using Dara;
 using Rayterra.World;
 
 namespace Rayterra;
