@@ -3,9 +3,10 @@ namespace Rayterra;
 using Raylib_cs;
 using ImGuiNET;
 using rlImGui_cs;
+
 using Core;
 
-public class Rayterra : Game
+public class Game : Core.Game
 {
     override protected string WindowTitle => "Rayterra";
 
@@ -46,48 +47,74 @@ public class Rayterra : Game
 
         ImGui.Text($"FPS: {Raylib.GetFPS()}");
         ImGui.Text($"Total Entities: {_manager.Count}");
-
         ImGui.NewLine();
 
-        ImGui.SliderFloat("Dirt Scale", ref _dirtScale, 0.001f, 0.2f);
-        if (ImGui.IsItemEdited())
-        {
-            _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
-        }
-
-        ImGui.SliderFloat("Stone Scale", ref _stoneScale, 0.001f, 0.2f);
-        if (ImGui.IsItemEdited())
-        {
-            _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
-        }
-
-        ImGui.NewLine();
-
-        ImGui.SliderFloat("Cave Scale", ref _caveScale, 1.0f, 20.0f);
-        if (ImGui.IsItemEdited())
-        {
-            _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
-        }
-
-        ImGui.SliderFloat("Cave Exposure", ref _caveExposure, 0.1f, 1.0f);
-        if (ImGui.IsItemEdited())
-        {
-            _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
-        }
-
-        ImGui.NewLine();
-
-        ImGui.Text($"Updating time: {Profiler.GetProfile("Update").time} ms");
-        ImGui.Text($"Entity Updating time: {Profiler.GetProfile("EntityUpdate").time} ms");
-
-        ImGui.NewLine();
-
-        ImGui.Text($"Entity Rendering time: {Profiler.GetProfile("EntityRender").time} ms");
-        ImGui.Text($"Rendering time: {Profiler.GetProfile("Render").time} ms");
-        ImGui.Text($"Debug UI time: {Profiler.GetProfile("DebugUI").time} ms");
-        ImGui.Text($"Present time: {Profiler.GetProfile("Present").time} ms");
+        MapDebugUI();
+        ProfilerDebugUI();
+        PlayerDebugUI();
 
         rlImGui.End();
     }
 
+    private void ProfilerDebugUI()
+    {
+        if (ImGui.CollapsingHeader("Profiler"))
+        {
+            ImGui.Text($"Updating time: {Profiler.GetProfile("Update").time} ms");
+            ImGui.Text($"Entity Updating time: {Profiler.GetProfile("EntityUpdate").time} ms");
+
+            ImGui.NewLine();
+
+            ImGui.Text($"Entity Rendering time: {Profiler.GetProfile("EntityRender").time} ms");
+            ImGui.Text($"Rendering time: {Profiler.GetProfile("Render").time} ms");
+            ImGui.Text($"Debug UI time: {Profiler.GetProfile("DebugUI").time} ms");
+            ImGui.Text($"Present time: {Profiler.GetProfile("Present").time} ms");
+
+            ImGui.NewLine();
+        }
+    }
+
+    private void PlayerDebugUI()
+    {
+        if (ImGui.CollapsingHeader("Player"))
+        {
+            ImGui.Text($"IsTouchingFloor: {_player.IsTouchingFloor}");
+
+            ImGui.NewLine();
+        }
+    }
+
+    private void MapDebugUI()
+    {
+        if (ImGui.CollapsingHeader("Map"))
+        {
+            ImGui.SliderFloat("Dirt Scale", ref _dirtScale, 0.001f, 0.2f);
+            if (ImGui.IsItemEdited())
+            {
+                _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
+            }
+
+            ImGui.SliderFloat("Stone Scale", ref _stoneScale, 0.001f, 0.2f);
+            if (ImGui.IsItemEdited())
+            {
+                _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
+            }
+
+            ImGui.NewLine();
+
+            ImGui.SliderFloat("Cave Scale", ref _caveScale, 1.0f, 20.0f);
+            if (ImGui.IsItemEdited())
+            {
+                _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
+            }
+
+            ImGui.SliderFloat("Cave Exposure", ref _caveExposure, 0.1f, 1.0f);
+            if (ImGui.IsItemEdited())
+            {
+                _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
+            }
+
+            ImGui.NewLine();
+        }
+    }
 }

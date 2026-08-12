@@ -14,6 +14,8 @@ public class Player : IEntity
     private const float GRAVITY = 10f;
     private const float SPEED = 100;
 
+    public bool IsTouchingFloor { get; private set; } = false;
+
     private Vector2 _velocity = new();
 
     private AABB _collisionRange;
@@ -28,11 +30,17 @@ public class Player : IEntity
         _collisionRange = new();
     }
 
+    public float CoyoteTimer { get; private set; } = 0;
+    public const float CoyoteDuration = 0.1f;
+
     public void Update(float deltaTime, EntityManager manager)
     {
+        if (CoyoteTimer > 0) { CoyoteTimer -= deltaTime; }
+        else { IsTouchingFloor = false; }
+
         _velocity.Y += GRAVITY * deltaTime;
 
-        if (Input.IsKeyPressed(KeyboardKey.Space))
+        if (IsTouchingFloor && Input.IsKeyPressed(KeyboardKey.Space))
         {
             _velocity.Y = -3f;
         }
@@ -64,6 +72,8 @@ public class Player : IEntity
                 if (collisionRect.Center.Y > Body.Center.Y)
                 {
                     Body.Position.Y -= collisionRect.Size.Y;
+                    IsTouchingFloor = true;
+                    CoyoteTimer = CoyoteDuration;
                 }
                 else
                 {
