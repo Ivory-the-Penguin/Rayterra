@@ -17,7 +17,7 @@ public class AABB
     public Vector2 Max
     {
         get => Position + Size;
-        set => Size = Max - Position;
+        set => Size = value - Position;
     }
 
     public Rectangle RayRect => new Rectangle(Position, Size);
