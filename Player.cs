@@ -11,10 +11,15 @@ public class Player : IEntity
 
     public AABB Body { get; private set; }
 
-    private const float GRAVITY = 10f;
-    private const float SPEED = 100;
+    private const float Gravity = 10f;
+    private const float Speed = 150f;
 
     public bool IsTouchingFloor { get; private set; } = false;
+
+    public float CoyoteTimer { get; private set; } = 0;
+    public const float CoyoteDuration = 0.1f;
+
+    public const float JumpForce = 4f;
 
     private Vector2 _velocity = new();
 
@@ -30,23 +35,11 @@ public class Player : IEntity
         _collisionRange = new();
     }
 
-    public float CoyoteTimer { get; private set; } = 0;
-    public const float CoyoteDuration = 0.1f;
 
     public void Update(float deltaTime, EntityManager manager)
     {
-        if (CoyoteTimer > 0) { CoyoteTimer -= deltaTime; }
-        else { IsTouchingFloor = false; }
-
-        _velocity.Y += GRAVITY * deltaTime;
-
-        if (IsTouchingFloor && Input.IsKeyPressed(KeyboardKey.Space))
-        {
-            _velocity.Y = -3f;
-        }
-
-        int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
-        _velocity.X = keyX * SPEED * deltaTime;
+        HandleHorizontalMovement(deltaTime);
+        HandleVerticalMovement(deltaTime);
 
         for (int i = 0; i < 10; i++)
         {
@@ -54,6 +47,25 @@ public class Player : IEntity
         }
 
         Camera.Position = Body.Center - (Raylib.GetScreenCenter() / Camera.Zoom);
+    }
+
+    private void HandleVerticalMovement(float deltaTime)
+    {
+        int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
+        _velocity.X = keyX * Speed * deltaTime;
+    }
+
+    private void HandleHorizontalMovement(float deltaTime)
+    {
+        if (CoyoteTimer > 0) { CoyoteTimer -= deltaTime; }
+        else { IsTouchingFloor = false; }
+
+        if (IsTouchingFloor && Input.IsKeyPressed(KeyboardKey.Space))
+        {
+            _velocity.Y = -JumpForce;
+        }
+
+        _velocity.Y += Gravity * deltaTime;
     }
 
     private void HandleCollisions(Vector2 velocity)
