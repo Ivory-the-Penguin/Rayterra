@@ -1,10 +1,10 @@
-namespace Rayterra;
-
 using Raylib_cs;
 using ImGuiNET;
 using rlImGui_cs;
+using Rayterra.Core;
+using Rayterra.World;
 
-using Core;
+namespace Rayterra;
 
 public class Game : Core.Game
 {

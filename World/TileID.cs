@@ -1,4 +1,4 @@
-namespace Rayterra;
+namespace Rayterra.World;
 
 public enum TileID
 {

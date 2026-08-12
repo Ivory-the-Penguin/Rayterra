@@ -2,7 +2,7 @@ using System.Numerics;
 using Raylib_cs;
 using Rayterra.Core;
 
-namespace Rayterra;
+namespace Rayterra.World;
 
 public class Map
 {

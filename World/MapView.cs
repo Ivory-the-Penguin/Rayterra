@@ -1,4 +1,4 @@
-namespace Rayterra;
+namespace Rayterra.World;
 
 public record struct MapPosition(int X, int Y);
 

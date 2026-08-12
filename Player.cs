@@ -2,6 +2,7 @@ using System.Numerics;
 using Raylib_cs;
 using Rayterra.Core.Entity;
 using Rayterra.Core;
+using Rayterra.World;
 
 namespace Rayterra;
 
