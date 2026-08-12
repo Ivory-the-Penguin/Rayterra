@@ -9,6 +9,7 @@ namespace Rayterra;
 public class Player : IEntity
 {
     public Camera Camera { get; private set; } = new();
+    public Inventory Inventory { get; private set; } = new();
 
     public AABB Body { get; private set; }
 
@@ -27,6 +28,7 @@ public class Player : IEntity
     private AABB _collisionRange;
 
     private Map _map;
+
 
     public Player(Map map)
     {

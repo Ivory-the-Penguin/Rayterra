@@ -34,6 +34,8 @@ public class Game : Dara.Game
         using (new ProfilerScope("EntityRender")) { _manager.Render(); }
 
         Raylib.EndMode2D();
+
+        _player.Inventory.RenderUI();
     }
 
     private float _dirtScale = 0.008f;
