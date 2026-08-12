@@ -40,8 +40,10 @@ public class Player : IEntity
 
     public void Update(float deltaTime, EntityManager manager)
     {
-        HandleHorizontalMovement(deltaTime);
-        HandleVerticalMovement(deltaTime);
+        HandleYMovement(deltaTime);
+        HandleXMovement(deltaTime);
+
+        HandleBlockBreaking();
 
         for (int i = 0; i < 10; i++)
         {
@@ -49,7 +51,10 @@ public class Player : IEntity
         }
 
         Camera.Position = Body.Center - (Raylib.GetScreenCenter() / Camera.Zoom);
+    }
 
+    private void HandleBlockBreaking()
+    {
         _selected = _map.WorldToMapPosition(Camera.MousePosition);
 
         if (Input.IsMouseButtonDown(MouseButton.Left) && Vector2.Distance(Body.Center, Camera.MousePosition) < Map.TileSize * TileRange)
@@ -58,13 +63,13 @@ public class Player : IEntity
         }
     }
 
-    private void HandleVerticalMovement(float deltaTime)
+    private void HandleXMovement(float deltaTime)
     {
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
         _velocity.X = keyX * Speed * deltaTime;
     }
 
-    private void HandleHorizontalMovement(float deltaTime)
+    private void HandleYMovement(float deltaTime)
     {
         if (CoyoteTimer > 0) { CoyoteTimer -= deltaTime; }
         else { IsTouchingFloor = false; }
