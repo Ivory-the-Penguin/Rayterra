@@ -1,4 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
 using Raylib_cs;
 
 namespace Rayterra.Core;
@@ -12,7 +11,6 @@ public static class Assets
 
     public static void CheckPath(string path)
     {
-
         if (!Path.Exists(path))
         {
             throw new InvalidOperationException($"Path '{path}' does not exist!");

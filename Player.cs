@@ -32,7 +32,7 @@ public class Player : IEntity
     {
         _velocity.Y += GRAVITY * deltaTime;
 
-        if (Input.IsKeyDown(KeyboardKey.Space))
+        if (Input.IsKeyPressed(KeyboardKey.Space))
         {
             _velocity.Y = -3f;
         }
@@ -57,22 +57,30 @@ public class Player : IEntity
         List<AABB> nearbyTileBoxes = _map.GetNearbyTileAABBs(_collisionRange);
         foreach (AABB box in nearbyTileBoxes)
         {
-            AABB cr = Body.GetCollisionRect(box);
-            if (cr.IsZero()) continue;
-            if (cr.Size.X > cr.Size.Y)
+            AABB collisionRect = Body.GetCollisionRect(box);
+            if (collisionRect.IsZero()) continue;
+            if (collisionRect.Size.X > collisionRect.Size.Y)
             {
-                if (cr.Center.Y > Body.Center.Y)
-                    Body.Position.Y -= cr.Size.Y;
+                if (collisionRect.Center.Y > Body.Center.Y)
+                {
+                    Body.Position.Y -= collisionRect.Size.Y;
+                }
                 else
-                    Body.Position.Y += cr.Size.Y;
+                {
+                    Body.Position.Y += collisionRect.Size.Y;
+                }
                 _velocity.Y = 0;
             }
             else
             {
-                if (cr.Center.X > Body.Center.X)
-                    Body.Position.X -= cr.Size.X;
+                if (collisionRect.Center.X > Body.Center.X)
+                {
+                    Body.Position.X -= collisionRect.Size.X;
+                }
                 else
-                    Body.Position.X += cr.Size.X;
+                {
+                    Body.Position.X += collisionRect.Size.X;
+                }
                 _velocity.X = 0;
 
             }

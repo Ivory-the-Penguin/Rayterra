@@ -1,91 +1,38 @@
-using Rayterra.Core.Entity;
-
 namespace Rayterra;
 
 using Raylib_cs;
 using ImGuiNET;
 using rlImGui_cs;
-using Rayterra.Core;
+using Core;
 
-public class Game
+public class Rayterra : Game
 {
-    private const int WINDOW_WIDTH = 1280;
-    private const int WINDOW_HEIGHT = 720;
-    private const string WINDOW_TITLE = "Rayterra";
-    private const int FPS = 60;
+    override protected string WindowTitle => "Rayterra";
 
-    private EntityManager _manager = null!;
     private Map _map = null!;
 
     private Player _player = null!;
 
-    public Game()
+    override protected void Init()
     {
-        InitWindow();
-        LoadTextures();
-
-        InitSystems();
-        InitEntities();
-    }
-    public void InitEntities()
-    {
+        _map = new();
         _player = new(_map);
 
         _manager.AddEntity(_player);
-    }
-
-    private void InitWindow()
-    {
-        Raylib.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
-        Raylib.SetTargetFPS(FPS);
-        Raylib.ToggleFullscreen();
-
-        rlImGui.Setup(true);
-    }
-
-    private void LoadTextures()
-    {
-    }
-
-    private void InitSystems()
-    {
-        _manager = new();
-        _map = new();
 
         _map.GenMap(_dirtScale, _stoneScale, _caveScale, _caveExposure);
     }
 
-    private void Update()
+    override protected void Render()
     {
-        using (new ProfilerScope("update"))
-        {
-            float deltaTime = Raylib.GetFrameTime();
+        Raylib.ClearBackground(Color.SkyBlue);
 
-            _manager.Update(deltaTime);
-        }
-    }
+        Raylib.BeginMode2D(_player.Camera.RaylibCamera);
 
-    private void Render()
-    {
-        using (new ProfilerScope("render"))
-        {
-            Raylib.BeginDrawing();
+        _map.Render(_player.Camera);
+        using (new ProfilerScope("EntityRender")) { _manager.Render(); }
 
-            Raylib.ClearBackground(Color.SkyBlue);
-
-            Raylib.BeginMode2D(_player.Camera.RaylibCamera);
-
-            _map.Render(_player.Camera);
-            _manager.Render();
-
-            Raylib.EndMode2D();
-        }
-
-#if DEBUG
-        using (new ProfilerScope("debug_render")) { RenderDebugUI(); }
-#endif
-
-        using (new ProfilerScope("present")) { Raylib.EndDrawing(); }
+        Raylib.EndMode2D();
     }
 
     private float _dirtScale = 0.008f;
@@ -93,7 +40,7 @@ public class Game
     private float _caveScale = 13.2f;
     private float _caveExposure = 0.55f;
 
-    private void RenderDebugUI()
+    override protected void RenderDebugUI()
     {
         rlImGui.Begin();
 
@@ -130,27 +77,17 @@ public class Game
 
         ImGui.NewLine();
 
-        ImGui.Text($"Updating time: {Profiler.GetProfile("update").time} ms");
-        ImGui.Text($"Rendering time: {Profiler.GetProfile("render").time} ms");
-        ImGui.Text($"Present time: {Profiler.GetProfile("present").time} ms");
-        ImGui.Text($"Debug Render time: {Profiler.GetProfile("debug_render").time} ms");
+        ImGui.Text($"Updating time: {Profiler.GetProfile("Update").time} ms");
+        ImGui.Text($"Entity Updating time: {Profiler.GetProfile("EntityUpdate").time} ms");
+
+        ImGui.NewLine();
+
+        ImGui.Text($"Entity Rendering time: {Profiler.GetProfile("EntityRender").time} ms");
+        ImGui.Text($"Rendering time: {Profiler.GetProfile("Render").time} ms");
+        ImGui.Text($"Debug UI time: {Profiler.GetProfile("DebugUI").time} ms");
+        ImGui.Text($"Present time: {Profiler.GetProfile("Present").time} ms");
 
         rlImGui.End();
     }
 
-    private void Cleanup()
-    {
-        rlImGui.Shutdown();
-        Raylib.CloseWindow();
-    }
-
-    public void Run()
-    {
-        while (!Raylib.WindowShouldClose())
-        {
-            Update();
-            Render();
-        }
-        Cleanup();
-    }
 }
