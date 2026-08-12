@@ -6,10 +6,10 @@ namespace Rayterra;
 
 public class Map
 {
-    private const int TILE_SIZE = 8;
+    public const int TileSize = 8;
 
-    private const int WORLD_WIDTH = 2100;
-    private const int WORLD_HEIGHT = 600;
+    public const int WorldWidth = 2100;
+    public const int WorldHeight = 600;
 
     private TextureAtlas _atlas;
 
@@ -20,30 +20,30 @@ public class Map
 
     public Map()
     {
-        _atlas = Assets.InitAtlas("MapAtlas", "./Assets/RayterraAtlas.png", TILE_SIZE);
+        _atlas = Assets.InitAtlas("MapAtlas", "./Assets/RayterraAtlas.png", TileSize);
         InitializeWorld();
     }
 
     public void InitializeWorld()
     {
-        _worldView = new MapView(new MapPosition(0, 0), WORLD_WIDTH, WORLD_HEIGHT);
+        _worldView = new MapView(new MapPosition(0, 0), WorldWidth, WorldHeight);
 
-        _tiles = new List<List<TileID>>(WORLD_WIDTH);
-        for (int i = 0; i < WORLD_WIDTH; i++)
+        _tiles = new List<List<TileID>>(WorldWidth);
+        for (int i = 0; i < WorldWidth; i++)
         {
-            List<TileID> column = new(WORLD_HEIGHT);
-            for (int j = 0; j < WORLD_HEIGHT; j++)
+            List<TileID> column = new(WorldHeight);
+            for (int j = 0; j < WorldHeight; j++)
             {
                 column.Add(TileID.None);
             }
             _tiles.Add(column);
         }
 
-        _lightValues = new List<List<int>>(WORLD_WIDTH);
-        for (int i = 0; i < WORLD_WIDTH; i++)
+        _lightValues = new List<List<int>>(WorldWidth);
+        for (int i = 0; i < WorldWidth; i++)
         {
-            List<int> column = new(WORLD_HEIGHT);
-            for (int j = 0; j < WORLD_HEIGHT; j++)
+            List<int> column = new(WorldHeight);
+            for (int j = 0; j < WorldHeight; j++)
             {
                 column.Add(0);
             }
@@ -73,13 +73,13 @@ public class Map
         ClearWorld();
 
         // DIRT
-        Image perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, 1, 0, 0, dirtScale);
+        Image perlin = Raylib.GenImagePerlinNoise(WorldWidth, 1, 0, 0, dirtScale);
 
-        for (int x = 0; x < WORLD_WIDTH; x++)
+        for (int x = 0; x < WorldWidth; x++)
         {
             int height = (int)(Raylib.ColorNormalize(Raylib.GetImageColor(perlin, x, 0)).X * GRASS_RANGE) + GRASS_MAX_HEIGHT;
 
-            for (int y = height; y < WORLD_HEIGHT; y++)
+            for (int y = height; y < WorldHeight; y++)
             {
                 if (y == height)
                 {
@@ -96,13 +96,13 @@ public class Map
 
 
         // STONE
-        perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, 1, 0, 0, stoneScale);
+        perlin = Raylib.GenImagePerlinNoise(WorldWidth, 1, 0, 0, stoneScale);
 
-        for (int x = 0; x < WORLD_WIDTH; x++)
+        for (int x = 0; x < WorldWidth; x++)
         {
             int height = (int)(Raylib.ColorNormalize(Raylib.GetImageColor(perlin, x, 0)).X * STONE_RANGE) + STONE_MAX_HEIGHT;
 
-            for (int y = height; y < WORLD_HEIGHT; y++)
+            for (int y = height; y < WorldHeight; y++)
             {
                 _tiles[x][y] = TileID.Stone;
             }
@@ -110,9 +110,9 @@ public class Map
         Raylib.UnloadImage(perlin);
 
         // CAVES
-        perlin = Raylib.GenImagePerlinNoise(WORLD_WIDTH, WORLD_HEIGHT - CAVE_MAX_HEIGHT, 0, 0, caveScale);
+        perlin = Raylib.GenImagePerlinNoise(WorldWidth, WorldHeight - CAVE_MAX_HEIGHT, 0, 0, caveScale);
 
-        MapView caveView = new MapView(new MapPosition(0, CAVE_MAX_HEIGHT), WORLD_WIDTH, WORLD_HEIGHT - CAVE_MAX_HEIGHT);
+        MapView caveView = new MapView(new MapPosition(0, CAVE_MAX_HEIGHT), WorldWidth, WorldHeight - CAVE_MAX_HEIGHT);
         foreach (MapPosition position in caveView)
         {
             if (Raylib.ColorNormalize(Raylib.GetImageColor(perlin, position.X, position.Y - CAVE_MAX_HEIGHT)).X > caveExposure)
@@ -211,7 +211,7 @@ public class Map
             }
         }
 
-        Raylib.DrawRectangleLines(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE, Color.Red);
+        Raylib.DrawRectangleLines(0, 0, WorldWidth * TileSize, WorldHeight * TileSize, Color.Red);
     }
 
     public List<AABB> GetNearbyTileAABBs(AABB region)
@@ -225,15 +225,15 @@ public class Map
             {
                 continue;
             }
-            hitboxList.Add(new AABB(MapToWorldPosition(position), new Vector2(TILE_SIZE)));
+            hitboxList.Add(new AABB(MapToWorldPosition(position), new Vector2(TileSize)));
         }
 
         return hitboxList;
     }
 
-    private Vector2 MapToWorldPosition(MapPosition position)
+    public Vector2 MapToWorldPosition(MapPosition position)
     {
-        return new Vector2(position.X * TILE_SIZE, position.Y * TILE_SIZE);
+        return new Vector2(position.X * TileSize, position.Y * TileSize);
     }
 
     private Color LightValueToColor(int lightValue)
@@ -244,7 +244,7 @@ public class Map
 
     public MapPosition WorldToMapPosition(Vector2 position)
     {
-        return new MapPosition(Math.Clamp((int)(position.X / TILE_SIZE), 0, WORLD_WIDTH - 1), Math.Clamp((int)(position.Y / TILE_SIZE), 0, WORLD_HEIGHT - 1));
+        return new MapPosition(Math.Clamp((int)(position.X / TileSize), 0, WorldWidth - 1), Math.Clamp((int)(position.Y / TileSize), 0, WorldHeight - 1));
     }
 
     public TileID GetTile(MapPosition position)
@@ -289,7 +289,7 @@ public class Map
 
     public MapView GetCameraView(Camera camera)
     {
-        MapPosition size = new MapPosition((int)(Raylib.GetScreenWidth() / camera.Zoom / TILE_SIZE), (int)(Raylib.GetScreenHeight() / camera.Zoom / TILE_SIZE));
+        MapPosition size = new MapPosition((int)(Raylib.GetScreenWidth() / camera.Zoom / TileSize), (int)(Raylib.GetScreenHeight() / camera.Zoom / TileSize));
 
         return new MapView(WorldToMapPosition(camera.Position), size.X + 2, size.Y + 2);
     }
@@ -301,7 +301,7 @@ public class Map
             return false;
         }
 
-        if (position.X >= WORLD_WIDTH || position.Y >= WORLD_HEIGHT)
+        if (position.X >= WorldWidth || position.Y >= WorldHeight)
         {
             return false;
         }

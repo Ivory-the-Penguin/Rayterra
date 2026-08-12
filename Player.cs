@@ -35,6 +35,8 @@ public class Player : IEntity
         _collisionRange = new();
     }
 
+    public const int TileRange = 5;
+    private MapPosition _selected;
 
     public void Update(float deltaTime, EntityManager manager)
     {
@@ -48,9 +50,11 @@ public class Player : IEntity
 
         Camera.Position = Body.Center - (Raylib.GetScreenCenter() / Camera.Zoom);
 
-        if (Input.IsMouseButtonDown(MouseButton.Left))
+        _selected = _map.WorldToMapPosition(Camera.MousePosition);
+
+        if (Input.IsMouseButtonDown(MouseButton.Left) && Vector2.Distance(Body.Center, Camera.MousePosition) < Map.TileSize * TileRange)
         {
-            _map.BreakTile(_map.WorldToMapPosition(Camera.Position + (Input.MousePosition / Camera.Zoom)));
+            _map.BreakTile(_selected);
         }
     }
 
@@ -118,5 +122,10 @@ public class Player : IEntity
     {
         Body.RenderHitbox();
         _collisionRange.RenderHitbox(Color.Magenta, 1);
+
+        if ((int)_map.GetTile(_selected) >= 0)
+        {
+            Raylib.DrawRectangleRoundedLinesEx(new Rectangle(_map.MapToWorldPosition(_selected), new Vector2(Map.TileSize)), 0.2f, 5, 1.5f, Color.Yellow);
+        }
     }
 }

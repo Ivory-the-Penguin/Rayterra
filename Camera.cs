@@ -23,6 +23,8 @@ public class Camera
         set => _object.Target = value;
     }
 
+    public Vector2 MousePosition => Position + (Input.MousePosition / Zoom);
+
     const int SPEED = 1_000;
 
     public Camera()
