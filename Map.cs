@@ -49,8 +49,6 @@ public class Map
             }
             _lightValues.Add(column);
         }
-
-        ClearWorld();
     }
 
     public void ClearWorld()
@@ -182,6 +180,19 @@ public class Map
                 queue.Enqueue((neighbor, current.Light - 1));
             }
         }
+    }
+
+    public TileID BreakTile(MapPosition position)
+    {
+        TileID tile = GetTile(position);
+
+        SetTile(position, TileID.Air);
+
+        SimulateLight(new MapView(
+            new MapPosition(position.X - LIGHT_VALUE_MAX, position.Y - LIGHT_VALUE_MAX),
+            new MapPosition(position.X + LIGHT_VALUE_MAX, position.Y + LIGHT_VALUE_MAX)));
+
+        return tile;
     }
 
     private const int LIGHT_VALUE_MAX = 8;

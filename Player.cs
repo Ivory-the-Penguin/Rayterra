@@ -47,6 +47,11 @@ public class Player : IEntity
         }
 
         Camera.Position = Body.Center - (Raylib.GetScreenCenter() / Camera.Zoom);
+
+        if (Input.IsMouseButtonDown(MouseButton.Left))
+        {
+            _map.BreakTile(_map.WorldToMapPosition(Camera.Position + (Input.MousePosition / Camera.Zoom)));
+        }
     }
 
     private void HandleVerticalMovement(float deltaTime)
