@@ -13,7 +13,7 @@ public class Map
 
     private TextureAtlas _atlas;
 
-    private List<List<Tile>> _tiles = null!;
+    private Tile[] _tiles = null!;
 
     private MapView _worldView;
 
@@ -27,16 +27,7 @@ public class Map
     {
         _worldView = new MapView(new MapPosition(0, 0), WorldWidth, WorldHeight);
 
-        _tiles = new List<List<Tile>>(WorldWidth);
-        for (int i = 0; i < WorldWidth; i++)
-        {
-            List<Tile> column = new(WorldHeight);
-            for (int j = 0; j < WorldHeight; j++)
-            {
-                column.Add(new Tile(TileID.None));
-            }
-            _tiles.Add(column);
-        }
+        _tiles = new Tile[WorldWidth * WorldHeight];
     }
 
     public void ClearWorld()
@@ -236,8 +227,7 @@ public class Map
                 return Tile.None;
             }
 
-            return _tiles[position.X][position.Y];
-
+            return _tiles[position.Y * WorldWidth + position.X];
         }
 
         set
@@ -247,8 +237,7 @@ public class Map
                 return;
             }
 
-            _tiles[position.X][position.Y] = value;
-
+            _tiles[position.Y * WorldWidth + position.X] = value;
         }
     }
 
