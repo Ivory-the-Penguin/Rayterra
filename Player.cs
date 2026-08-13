@@ -43,15 +43,10 @@ public class Player : IEntity
 
     public void Update(float deltaTime, EntityManager manager)
     {
-        HandleYMovement(deltaTime);
         HandleXMovement(deltaTime);
+        HandleYMovement(deltaTime);
 
         HandleBlockStuff(deltaTime);
-
-        for (int i = 0; i < 10; i++)
-        {
-            HandleCollisions(_velocity / 10);
-        }
 
         Camera.Position = Body.Center - (Raylib.GetScreenCenter() / Camera.Zoom);
     }
@@ -87,6 +82,11 @@ public class Player : IEntity
     {
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
         _velocity.X = keyX * Speed * deltaTime;
+
+        for (int i = 0; i < 10; i++)
+        {
+            HandleCollisions(new Vector2(_velocity.X / 10, 0));
+        }
     }
 
     private void HandleYMovement(float deltaTime)
@@ -100,6 +100,11 @@ public class Player : IEntity
         }
 
         _velocity.Y += Gravity * deltaTime;
+
+        for (int i = 0; i < 10; i++)
+        {
+            HandleCollisions(new Vector2(0, _velocity.Y / 10));
+        }
     }
 
     private void HandleCollisions(Vector2 velocity)
