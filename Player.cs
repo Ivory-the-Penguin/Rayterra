@@ -63,7 +63,7 @@ public class Player : IEntity
 
                 if (selectedTile.IsSolid)
                 {
-                    if (Inventory.Selected.ID == selectedTile.ID || Inventory.Selected == Item.None)
+                    if (Inventory.Selected.ID == selectedTile.ID || Inventory.Selected.IsEmpty)
                     {
                         Inventory.Selected = new Item(selectedTile.ID, Inventory.Selected.Amount + 1);
                         _map[_selectedTilePosition] = new Tile(TileID.Air);
@@ -71,7 +71,7 @@ public class Player : IEntity
                 }
                 else
                 {
-                    if (Inventory.Selected)
+                    if (Inventory.Selected.IsEmpty)
                     {
                         _map[_selectedTilePosition] = new Tile(Inventory.Selected.ID);
                         if (IsColliding())
