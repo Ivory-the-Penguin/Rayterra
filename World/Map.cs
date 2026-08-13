@@ -188,7 +188,7 @@ public class Map
         Raylib.DrawRectangleLines(0, 0, WorldWidth * TileSize, WorldHeight * TileSize, Color.Red);
     }
 
-    public List<AABB> GetNearbyTileAABBs(AABB region)
+    public AABB[] GetNearbyTileAABBs(AABB region)
     {
         MapView view = new MapView(WorldToMapPosition(region.Min), WorldToMapPosition(region.Max));
 
@@ -201,7 +201,7 @@ public class Map
             }
         }
 
-        return hitboxList;
+        return hitboxList.ToArray();
     }
 
     public Vector2 MapToWorldPosition(MapPosition position)

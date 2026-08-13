@@ -102,9 +102,10 @@ public class Player : IEntity
         int keyX = Convert.ToInt32(Input.IsKeyDown(KeyboardKey.D)) - Convert.ToInt32(Input.IsKeyDown(KeyboardKey.A));
         _velocity.X = keyX * Speed * deltaTime;
 
+        var tileAABBs = GetTileAABBs();
         for (int i = 0; i < 10; i++)
         {
-            HandleCollisions(new Vector2(_velocity.X / 10, 0));
+            HandleCollisions(new Vector2(_velocity.X / 10, 0), tileAABBs);
         }
     }
 
@@ -120,20 +121,27 @@ public class Player : IEntity
 
         _velocity.Y += Gravity * deltaTime;
 
+        var tileAABBs = GetTileAABBs();
         for (int i = 0; i < 10; i++)
         {
-            HandleCollisions(new Vector2(0, _velocity.Y / 10));
+            HandleCollisions(new Vector2(0, _velocity.Y / 10), tileAABBs);
         }
     }
 
-    private void HandleCollisions(Vector2 velocity)
+    public AABB[] GetTileAABBs()
     {
-        _collisionRange.Position = Body.Center - new Vector2(25);
-        _collisionRange.Size = new Vector2(50);
+        _collisionRange.Position = Body.Center - new Vector2(30);
+        _collisionRange.Size = new Vector2(60);
 
+        return _map.GetNearbyTileAABBs(_collisionRange);
+    }
+
+    private void HandleCollisions(Vector2 velocity, AABB[] tileAABBs)
+    {
         Body.Position += velocity;
-        List<AABB> nearbyTileBoxes = _map.GetNearbyTileAABBs(_collisionRange);
-        foreach (AABB box in nearbyTileBoxes)
+        UpdateCollisionRange();
+
+        foreach (AABB box in tileAABBs)
         {
             AABB collisionRect = Body.GetCollisionRect(box);
             if (collisionRect.IsZero()) continue;
@@ -167,13 +175,19 @@ public class Player : IEntity
         }
     }
 
+    public const float CollisionRangeSize = 60;
+
+    private void UpdateCollisionRange()
+    {
+        _collisionRange.Position = Body.Center - new Vector2(CollisionRangeSize / 2);
+        _collisionRange.Size = new Vector2(CollisionRangeSize);
+    }
+
     private bool IsColliding()
     {
-        _collisionRange.Position = Body.Center - new Vector2(25);
-        _collisionRange.Size = new Vector2(50);
+        UpdateCollisionRange();
 
-        List<AABB> nearbyTileBoxes = _map.GetNearbyTileAABBs(_collisionRange);
-        foreach (AABB box in nearbyTileBoxes)
+        foreach (AABB box in _map.GetNearbyTileAABBs(_collisionRange))
         {
             AABB collisionRect = Body.GetCollisionRect(box);
             if (collisionRect.IsZero()) continue;
