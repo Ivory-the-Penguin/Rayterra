@@ -59,11 +59,37 @@ public class Player : IEntity
         {
             if (Input.IsMouseButtonPressed(MouseButton.Left))
             {
-                if (Inventory.Selected)
+                Tile selectedTile = _map[_selectedTilePosition];
+
+                if (selectedTile.IsSolid)
                 {
-                    Inventory.Selected--;
-                    _map.PlaceTile(_selectedTilePosition, Inventory.Selected.ID);
+                    if (Inventory.Selected.ID == selectedTile.ID || Inventory.Selected == Item.None)
+                    {
+                        Inventory.Selected = new Item(selectedTile.ID, Inventory.Selected.Amount + 1);
+                        _map[_selectedTilePosition] = new Tile(TileID.Air);
+                    }
                 }
+                else
+                {
+                    if (Inventory.Selected)
+                    {
+                        _map[_selectedTilePosition] = new Tile(Inventory.Selected.ID);
+                        if (IsColliding())
+                        {
+                            _map[_selectedTilePosition] = new Tile(TileID.Air);
+                        }
+                        else
+                        {
+                            Inventory.Selected = new Item(Inventory.Selected.ID, Inventory.Selected.Amount - 1);
+                            if (Inventory.Selected.Amount == 0)
+                            {
+                                Inventory.Selected = Item.None;
+                            }
+                        }
+                    }
+                }
+
+                _map.SimulateLightAroundTile(_selectedTilePosition);
             }
 
         }
@@ -87,7 +113,7 @@ public class Player : IEntity
         if (CoyoteTimer > 0) { CoyoteTimer -= deltaTime; }
         else { IsTouchingFloor = false; }
 
-        if (IsTouchingFloor && Input.IsKeyPressed(KeyboardKey.Space))
+        if (IsTouchingFloor && Input.IsKeyDown(KeyboardKey.Space))
         {
             _velocity.Y = -JumpForce;
         }
@@ -163,7 +189,7 @@ public class Player : IEntity
         Body.RenderHitbox();
         _collisionRange.RenderHitbox(Color.Magenta, 1);
 
-        if ((int)_map.GetTile(_selectedTilePosition) >= 0)
+        if (_map[_selectedTilePosition].IsSolid)
         {
             Raylib.DrawRectangleRoundedLinesEx(new Rectangle(_map.MapToWorldPosition(_selectedTilePosition), new Vector2(Map.TileSize)), 0.2f, 5, 1.5f, Color.Yellow);
         }

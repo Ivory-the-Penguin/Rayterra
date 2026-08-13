@@ -1,6 +1,19 @@
 namespace Rayterra.World;
 
-public record struct MapPosition(int X, int Y);
+public record struct MapPosition(int X, int Y)
+{
+    public MapPosition(int scalar) : this(scalar, scalar) { }
+
+    public static MapPosition operator +(MapPosition item1, MapPosition item2)
+    {
+        return new MapPosition(item1.X + item2.X, item1.Y + item2.Y);
+    }
+
+    public static MapPosition operator -(MapPosition item1, MapPosition item2)
+    {
+        return new MapPosition(item1.X - item2.X, item1.Y - item2.Y);
+    }
+}
 
 public struct MapView
 {
@@ -19,7 +32,7 @@ public struct MapView
     public MapView(MapPosition position, int width, int height)
     {
         Min = position;
-        Max = new MapPosition(Min.X + width, Min.Y + height);
+        Max = position + new MapPosition(width, height);
     }
 
     public struct Enumerator

@@ -4,6 +4,15 @@ using Dara;
 
 namespace Rayterra.World;
 
+public record struct Tile(TileID ID, int LightValue)
+{
+    public Tile(TileID ID) : this(ID, 0) { }
+
+    public bool IsSolid => ID >= 0;
+
+    public static Tile None = new Tile(TileID.None);
+}
+
 public class Map
 {
     public const int TileSize = 8;
@@ -13,8 +22,7 @@ public class Map
 
     private TextureAtlas _atlas;
 
-    private List<List<TileID>> _tiles = null!;
-    private List<List<int>> _lightValues = null!;
+    private List<List<Tile>> _tiles = null!;
 
     private MapView _worldView;
 
@@ -28,36 +36,21 @@ public class Map
     {
         _worldView = new MapView(new MapPosition(0, 0), WorldWidth, WorldHeight);
 
-        _tiles = new List<List<TileID>>(WorldWidth);
+        _tiles = new List<List<Tile>>(WorldWidth);
         for (int i = 0; i < WorldWidth; i++)
         {
-            List<TileID> column = new(WorldHeight);
+            List<Tile> column = new(WorldHeight);
             for (int j = 0; j < WorldHeight; j++)
             {
-                column.Add(TileID.None);
+                column.Add(new Tile(TileID.None));
             }
             _tiles.Add(column);
-        }
-
-        _lightValues = new List<List<int>>(WorldWidth);
-        for (int i = 0; i < WorldWidth; i++)
-        {
-            List<int> column = new(WorldHeight);
-            for (int j = 0; j < WorldHeight; j++)
-            {
-                column.Add(0);
-            }
-            _lightValues.Add(column);
         }
     }
 
     public void ClearWorld()
     {
-        foreach (MapPosition position in _worldView)
-        {
-            SetTile(position, TileID.Air);
-            SetLightValue(position, 0);
-        }
+        foreach (MapPosition position in _worldView) { this[position] = new Tile(TileID.Air); }
     }
 
     private const int GRASS_MAX_HEIGHT = 40;
@@ -81,13 +74,15 @@ public class Map
 
             for (int y = height; y < WorldHeight; y++)
             {
+                MapPosition position = new MapPosition(x, y);
+
                 if (y == height)
                 {
-                    _tiles[x][y] = TileID.Grass;
+                    this[position] = new Tile(TileID.Grass);
                 }
                 else
                 {
-                    _tiles[x][y] = TileID.Dirt;
+                    this[position] = new Tile(TileID.Dirt);
                 }
             }
         }
@@ -104,7 +99,7 @@ public class Map
 
             for (int y = height; y < WorldHeight; y++)
             {
-                _tiles[x][y] = TileID.Stone;
+                this[new MapPosition(x, y)] = new Tile(TileID.Stone);
             }
         }
         Raylib.UnloadImage(perlin);
@@ -117,7 +112,7 @@ public class Map
         {
             if (Raylib.ColorNormalize(Raylib.GetImageColor(perlin, position.X, position.Y - CAVE_MAX_HEIGHT)).X > caveExposure)
             {
-                SetTile(position, TileID.Air);
+                this[position] = new Tile(TileID.Air);
             }
         }
 
@@ -133,7 +128,9 @@ public class Map
 
         foreach (MapPosition position in view)
         {
-            if (GetTile(position) == TileID.Air)
+            this[position] = new Tile(this[position].ID);
+
+            if (this[position].ID == TileID.Air)
             {
                 queue.Enqueue((position, LIGHT_VALUE_MAX));
             }
@@ -145,63 +142,41 @@ public class Map
         {
             var current = queue.Dequeue();
 
-            if (GetLightValue(current.Position) >= current.Light)
+            if (this[current.Position].LightValue >= current.Light)
             {
                 continue;
             }
 
-
-            SetLightValue(current.Position, current.Light);
+            this[current.Position] = new Tile(this[current.Position].ID, current.Light);
 
             if (current.Light == 1)
             {
                 continue;
             }
 
-            neighbor = new MapPosition(current.Position.X + 1, current.Position.Y);
-            if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
+            neighbor = current.Position + new MapPosition(1, 0);
+            if (this[neighbor].IsSolid)
             {
                 queue.Enqueue((neighbor, current.Light - 1));
             }
-            neighbor = new MapPosition(current.Position.X - 1, current.Position.Y);
-            if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
+            neighbor = current.Position + new MapPosition(-1, 0);
+            if (this[neighbor].IsSolid)
             {
                 queue.Enqueue((neighbor, current.Light - 1));
             }
 
-            neighbor = new MapPosition(current.Position.X, current.Position.Y + 1);
-            if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
+            neighbor = current.Position + new MapPosition(0, 1);
+            if (this[neighbor].IsSolid)
             {
                 queue.Enqueue((neighbor, current.Light - 1));
             }
-            neighbor = new MapPosition(current.Position.X, current.Position.Y - 1);
-            if (IsInMap(neighbor) && GetTile(neighbor) != TileID.Air)
+
+            neighbor = current.Position + new MapPosition(0, -1);
+            if (this[neighbor].IsSolid)
             {
                 queue.Enqueue((neighbor, current.Light - 1));
             }
         }
-    }
-
-    public TileID BreakTile(MapPosition position)
-    {
-        TileID tile = GetTile(position);
-
-        SetTile(position, TileID.Air);
-
-        SimulateLight(new MapView(
-            new MapPosition(position.X - LIGHT_VALUE_MAX, position.Y - LIGHT_VALUE_MAX),
-            new MapPosition(position.X + LIGHT_VALUE_MAX, position.Y + LIGHT_VALUE_MAX)));
-
-        return tile;
-    }
-
-    public void PlaceTile(MapPosition position, TileID tile)
-    {
-        SetTile(position, tile);
-
-        SimulateLight(new MapView(
-            new MapPosition(position.X - LIGHT_VALUE_MAX, position.Y - LIGHT_VALUE_MAX),
-            new MapPosition(position.X + LIGHT_VALUE_MAX, position.Y + LIGHT_VALUE_MAX)));
     }
 
     private const int LIGHT_VALUE_MAX = 8;
@@ -210,13 +185,12 @@ public class Map
     {
         foreach (MapPosition position in GetCameraView(camera))
         {
-            Color lightColor = LightValueToColor(GetLightValue(position));
+            Tile tile = this[position];
+            Color lightColor = LightValueToColor(tile.LightValue);
 
-            TileID tile = GetTile(position);
-
-            if (tile != TileID.Air)
+            if (tile.IsSolid)
             {
-                _atlas.RenderTile((int)tile, MapToWorldPosition(position), 1, lightColor);
+                _atlas.RenderTile((int)tile.ID, MapToWorldPosition(position), 1, lightColor);
             }
         }
 
@@ -230,11 +204,10 @@ public class Map
         List<AABB> hitboxList = new();
         foreach (MapPosition position in view)
         {
-            if ((int)GetTile(position) < 0)
+            if (this[position].IsSolid)
             {
-                continue;
+                hitboxList.Add(new AABB(MapToWorldPosition(position), new Vector2(TileSize)));
             }
-            hitboxList.Add(new AABB(MapToWorldPosition(position), new Vector2(TileSize)));
         }
 
         return hitboxList;
@@ -256,44 +229,36 @@ public class Map
         return new MapPosition(Math.Clamp((int)(position.X / TileSize), 0, WorldWidth - 1), Math.Clamp((int)(position.Y / TileSize), 0, WorldHeight - 1));
     }
 
-    public TileID GetTile(MapPosition position)
+    public void SimulateLightAroundTile(MapPosition position)
     {
-        if (!IsInMap(position))
-        {
-            return TileID.None;
-        }
-
-        return _tiles[position.X][position.Y];
+        SimulateLight(new MapView(
+            position - new MapPosition(LIGHT_VALUE_MAX),
+            position + new MapPosition(LIGHT_VALUE_MAX)));
     }
 
-    public void SetTile(MapPosition position, TileID value)
+    public Tile this[MapPosition position]
     {
-        if (!IsInMap(position))
+        get
         {
-            return;
+            if (!IsInMap(position))
+            {
+                return Tile.None;
+            }
+
+            return _tiles[position.X][position.Y];
+
         }
 
-        _tiles[position.X][position.Y] = value;
-    }
-
-    public int GetLightValue(MapPosition position)
-    {
-        if (!IsInMap(position))
+        set
         {
-            return -1;
+            if (!IsInMap(position))
+            {
+                return;
+            }
+
+            _tiles[position.X][position.Y] = value;
+
         }
-
-        return _lightValues[position.X][position.Y];
-    }
-
-    public void SetLightValue(MapPosition position, int value)
-    {
-        if (!IsInMap(position))
-        {
-            return;
-        }
-
-        _lightValues[position.X][position.Y] = value;
     }
 
     public MapView GetCameraView(Camera camera)

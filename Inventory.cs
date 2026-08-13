@@ -18,15 +18,7 @@ public record struct Item(TileID ID, uint Amount)
         return item.ID < 0 || item.Amount == 0;
     }
 
-    public static Item operator ++(Item item)
-    {
-        return new Item(item.ID, item.Amount + 1);
-    }
-
-    public static Item operator --(Item item)
-    {
-        return new Item(item.ID, item.Amount - 1);
-    }
+    public static Item None = new Item(TileID.None, 0);
 }
 
 public class Inventory
@@ -63,8 +55,6 @@ public class Inventory
                 _inventory[i, j] = new Item(TileID.None, 0);
             }
         }
-
-        _inventory[0, 0] = new Item(TileID.Dirt, 3);
     }
 
     public void Update(float deltaTime)
