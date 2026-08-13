@@ -46,7 +46,7 @@ public class Player : IEntity
         HandleYMovement(deltaTime);
         HandleXMovement(deltaTime);
 
-        HandleBlockStuff();
+        HandleBlockStuff(deltaTime);
 
         for (int i = 0; i < 10; i++)
         {
@@ -56,7 +56,7 @@ public class Player : IEntity
         Camera.Position = Body.Center - (Raylib.GetScreenCenter() / Camera.Zoom);
     }
 
-    private void HandleBlockStuff()
+    private void HandleBlockStuff(float deltaTime)
     {
         _selected = _map.WorldToMapPosition(Camera.MousePosition);
 
@@ -79,6 +79,8 @@ public class Player : IEntity
             }
 
         }
+
+        Inventory.Update(deltaTime);
     }
 
     private void HandleXMovement(float deltaTime)
