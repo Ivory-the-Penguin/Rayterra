@@ -39,7 +39,7 @@ public class Player : IEntity
     }
 
     public const int TileRange = 5;
-    private MapPosition _selected;
+    private MapPosition _selectedTilePosition;
 
     public void Update(float deltaTime, EntityManager manager)
     {
@@ -53,23 +53,16 @@ public class Player : IEntity
 
     private void HandleBlockStuff(float deltaTime)
     {
-        _selected = _map.WorldToMapPosition(Camera.MousePosition);
+        _selectedTilePosition = _map.WorldToMapPosition(Camera.MousePosition);
 
         if (Vector2.Distance(Body.Center, Camera.MousePosition) < Map.TileSize * TileRange)
         {
             if (Input.IsMouseButtonPressed(MouseButton.Left))
             {
-                if (_map.GetTile(_selected) == TileID.Air)
+                if (Inventory.Selected)
                 {
-                    _map.PlaceTile(_selected, TileID.Dirt);
-                    if (IsColliding())
-                    {
-                        _map.BreakTile(_selected);
-                    }
-                }
-                else
-                {
-                    _map.BreakTile(_selected);
+                    Inventory.Selected--;
+                    _map.PlaceTile(_selectedTilePosition, Inventory.Selected.ID);
                 }
             }
 
@@ -170,9 +163,9 @@ public class Player : IEntity
         Body.RenderHitbox();
         _collisionRange.RenderHitbox(Color.Magenta, 1);
 
-        if ((int)_map.GetTile(_selected) >= 0)
+        if ((int)_map.GetTile(_selectedTilePosition) >= 0)
         {
-            Raylib.DrawRectangleRoundedLinesEx(new Rectangle(_map.MapToWorldPosition(_selected), new Vector2(Map.TileSize)), 0.2f, 5, 1.5f, Color.Yellow);
+            Raylib.DrawRectangleRoundedLinesEx(new Rectangle(_map.MapToWorldPosition(_selectedTilePosition), new Vector2(Map.TileSize)), 0.2f, 5, 1.5f, Color.Yellow);
         }
     }
 }
